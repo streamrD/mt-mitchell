@@ -42,7 +42,6 @@
     top: 0;
     z-index: 100;
   }
-
   header h1 { font-size: 14px; font-weight: 400; letter-spacing: 0.05em; }
   header p { font-size: 11px; opacity: 0.5; }
 
@@ -82,17 +81,10 @@
   }
   button:hover { background: #3a4a58; }
   button:disabled { opacity: 0.35; cursor: default; }
-
-  button.secondary {
-    background: white;
-    color: var(--ink);
-    border: 0.5px solid rgba(42,53,64,0.2);
-  }
+  button.secondary { background: white; color: var(--ink); border: 0.5px solid rgba(42,53,64,0.2); }
   button.secondary:hover { background: var(--bg2); }
-
   button.warm { background: var(--warm); color: white; }
   button.warm:hover { background: #a06030; }
-
   button.sm { padding: 4px 8px; font-size: 11px; }
 
   #control-panel {
@@ -153,6 +145,7 @@
   }
   #gallery-grid.drag-over { border-color: var(--accent); }
 
+  /* Photo thumbs */
   .thumb {
     position: relative;
     width: var(--thumb); height: var(--thumb);
@@ -186,17 +179,87 @@
     font-size: 7px; padding: 1px 4px; border-radius: 2px; text-transform: uppercase;
   }
 
-  .thumb .video-badge {
-    position: absolute; top: 3px; left: 3px;
-    background: rgba(42,53,64,0.8); color: white;
-    font-size: 7px; padding: 1px 4px; border-radius: 2px; text-transform: uppercase;
-  }
-
   .thumb .idx {
     position: absolute; bottom: 3px; right: 3px;
     background: rgba(18,24,28,0.5); color: rgba(255,255,255,0.8);
     font-size: 8px; padding: 1px 3px; border-radius: 2px; line-height: 1.2;
   }
+
+  /* Video cards — always wider, 16:9 feel */
+  .video-card {
+    position: relative;
+    width: 200px;
+    background: #2a3540;
+    border-radius: 3px;
+    overflow: hidden;
+    cursor: grab;
+    user-select: none;
+    border: 2px solid transparent;
+    transition: border-color 0.12s, transform 0.12s;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+  }
+  .video-card:active { cursor: grabbing; }
+  .video-card.selected { border-color: var(--warm); }
+  .video-card.dragging { opacity: 0.35; transform: scale(0.95); }
+  .video-card.drag-target { border-color: var(--accent); }
+
+  #pool .video-card { width: 160px; }
+
+  .video-card .yt-thumb {
+    width: 100%;
+    aspect-ratio: 16/9;
+    object-fit: cover;
+    display: block;
+    pointer-events: none;
+  }
+
+  .video-card .video-info {
+    padding: 5px 7px;
+    flex: 1;
+  }
+
+  .video-card .video-title {
+    font-size: 10px;
+    font-weight: 500;
+    color: rgba(210,228,236,0.9);
+    line-height: 1.3;
+    margin-bottom: 2px;
+  }
+
+  .video-card .video-date {
+    font-size: 9px;
+    color: rgba(160,188,200,0.6);
+    letter-spacing: 0.05em;
+  }
+
+  .video-card .video-badge {
+    position: absolute;
+    top: 4px; left: 4px;
+    background: rgba(192,128,64,0.9);
+    color: white;
+    font-size: 7px; padding: 2px 5px; border-radius: 2px;
+    text-transform: uppercase; letter-spacing: 0.05em;
+  }
+
+  .video-card .idx {
+    position: absolute; top: 4px; right: 4px;
+    background: rgba(18,24,28,0.6); color: rgba(255,255,255,0.8);
+    font-size: 8px; padding: 1px 3px; border-radius: 2px; line-height: 1.2;
+  }
+
+  .play-icon {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -65%);
+    width: 28px; height: 28px;
+    background: rgba(255,255,255,0.15);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    pointer-events: none;
+  }
+  .play-icon svg { width: 12px; height: 12px; }
 
   .empty-msg { font-size: 12px; color: var(--ink-light); padding: 1rem; letter-spacing: 0.05em; }
 
@@ -210,7 +273,7 @@
     font-family: monospace; font-size: 11px; line-height: 1.6;
     padding: 1rem; border-radius: 6px;
     white-space: pre-wrap; word-break: break-all;
-    max-height: 360px; overflow-y: auto;
+    max-height: 400px; overflow-y: auto;
   }
 </style>
 </head>
@@ -219,7 +282,7 @@
 <header>
   <div>
     <h1>Gallery Sorter — 6,684 Feet</h1>
-    <p>All images auto-loaded · Click to select · Drag or use arrow buttons to reorder</p>
+    <p>All images and videos auto-loaded · Click to select · Drag or use controls to reorder</p>
   </div>
   <button class="warm" onclick="generateCode()">Generate code ↗</button>
 </header>
@@ -242,25 +305,23 @@
   <button class="sm secondary" onclick="moveSelected(-1)">← Move left</button>
   <button class="sm secondary" onclick="moveSelected(1)">Move right →</button>
   <div class="sep"></div>
-  <span style="font-size:11px; color:var(--ink-light); margin-right:4px;">Layout:</span>
+  <span style="font-size:11px; color:var(--ink-light); margin-right:4px;">Photo layout:</span>
   <button class="override-btn active" data-class="" onclick="setOverride('')">Square</button>
   <button class="override-btn" data-class="wide" onclick="setOverride('wide')">Wide (2col)</button>
   <button class="override-btn" data-class="full" onclick="setOverride('full')">Full width</button>
   <button class="override-btn" data-class="tall" onclick="setOverride('tall')">Tall (2row)</button>
   <button class="override-btn" data-class="featured" onclick="setOverride('featured')">Featured (2×2)</button>
-  <div class="sep"></div>
-  <button class="override-btn" data-class="video" onclick="setOverride('video')">Mark as video</button>
 </div>
 
 <div class="status-bar" id="status-bar"></div>
 
 <div id="pool-section">
-  <h2>Pool — unplaced files</h2>
+  <h2>Pool — unplaced items</h2>
   <div id="pool"><span class="empty-msg">All files placed in gallery</span></div>
 </div>
 
 <div id="gallery-section">
-  <h2>Gallery order <span>Click to select · Shift+click for range · Drag to reorder</span></h2>
+  <h2>Gallery order <span>Click to select · Shift+click for range · Drag to reorder · Videos always render at full 16:9 width</span></h2>
   <div id="gallery-grid"></div>
 </div>
 
@@ -272,9 +333,18 @@
 
 <script>
 const BASE = 'https://s3.us-east-005.backblazeb2.com/mtmitchell/';
-const VIDEO_EXTS = ['mp4','mov','m4v','webm'];
 
-const ALL_FILES = [
+// YouTube videos — always rendered at 16:9, full grid width
+const VIDEOS = [
+  { type: 'video', title: 'The Clouds', date: 'April, 2026',   youtubeId: 'nk68MfdAjwA' },
+  { type: 'video', title: 'Joe Pye Weed', date: 'August, 2018', youtubeId: 'ufYKXkjgal8' },
+  { type: 'video', title: 'Morning at Maple Camp Bald', date: 'June, 2017', youtubeId: 'xfbcg2UW0Go' },
+  { type: 'video', title: 'The Doors of Perception on Middle Creek', date: 'October, 2016', youtubeId: 'V1gexqIlWgU' },
+  { type: 'video', title: 'Homage to the Chinese Taoist Poets', date: 'August, 2016', youtubeId: 'tevDGK7_cBs' },
+];
+
+// Photos from Backblaze
+const PHOTOS = [
   '0C9AFE49-0345-49C3-9173-95DDBF9738542022-10-23_11-37-12_729.jpeg',
   '4C072CB8-39B8-4FF6-B494-864AFEE7FF6F2022-10-23_11-44-57_175.jpeg',
   '7FD9E045-93B6-4371-9BBA-846871CAE3F328899061161_48ac818451_o.jpg',
@@ -309,17 +379,14 @@ const ALL_FILES = [
   'IMG_7681.JPG','IMG_7713.JPG','IMG_7716.JPG','IMG_7728.JPG',
   'IMG_7734.JPG','IMG_7745.JPG','IMG_7753.JPG','IMG_9408.JPG',
   'IMG_9742.JPG','PXL_20240915_134927818_Original.jpg'
-];
+].map(f => ({ type: 'photo', filename: f, override: '' }));
 
-let gallery = ALL_FILES.map(f => ({ filename: f, override: isVid(f) ? 'video' : '' }));
+// Start with photos + videos all in gallery (videos at end by default)
+let gallery = [...PHOTOS, ...VIDEOS];
 let pool = [];
 let selected = new Set();
 let dragSrcIdx = null;
 let dragFromPool = false;
-
-function isVid(f) {
-  return VIDEO_EXTS.includes(f.split('.').pop().toLowerCase());
-}
 
 function setStatus(msg) {
   document.getElementById('status-bar').textContent = msg;
@@ -328,65 +395,90 @@ function setStatus(msg) {
 function renderPool() {
   const el = document.getElementById('pool');
   if (pool.length === 0) {
-    el.innerHTML = '<span class="empty-msg">All files placed in gallery</span>';
+    el.innerHTML = '<span class="empty-msg">All items placed in gallery</span>';
     return;
   }
   el.innerHTML = '';
-  pool.forEach((item, i) => el.appendChild(makeThumb(item, i, true)));
+  pool.forEach((item, i) => el.appendChild(makeCard(item, i, true)));
 }
 
 function renderGallery() {
   const el = document.getElementById('gallery-grid');
   el.innerHTML = '';
   if (gallery.length === 0) {
-    el.innerHTML = '<span class="empty-msg">Drag files here from the pool above</span>';
+    el.innerHTML = '<span class="empty-msg">Gallery is empty — add items from pool above</span>';
     updateControlPanel();
     return;
   }
-  gallery.forEach((item, i) => el.appendChild(makeThumb(item, i, false)));
+  gallery.forEach((item, i) => el.appendChild(makeCard(item, i, false)));
   updateControlPanel();
-  setStatus(`${gallery.length} in gallery · ${pool.length} in pool · ${selected.size} selected`);
+  setStatus(`${gallery.length} items in gallery · ${pool.length} in pool · ${selected.size} selected`);
 }
 
-function makeThumb(item, idx, isPool) {
+function makeCard(item, idx, isPool) {
+  const isVideo = item.type === 'video';
   const div = document.createElement('div');
-  const selKey = isPool ? 'p'+idx : idx;
-  div.className = 'thumb' + (selected.has(selKey) ? ' selected' : '');
+  div.className = (isVideo ? 'video-card' : 'thumb') + (selected.has(idx) && !isPool ? ' selected' : '');
   div.dataset.idx = idx;
   div.draggable = true;
 
-  if (isVid(item.filename)) {
-    div.style.background = '#3a4e5a';
-    const vb = document.createElement('div');
-    vb.className = 'video-badge';
-    vb.textContent = 'video';
-    div.appendChild(vb);
+  if (isVideo) {
+    // YouTube thumbnail
+    const img = document.createElement('img');
+    img.className = 'yt-thumb';
+    img.src = `https://img.youtube.com/vi/${item.youtubeId}/mqdefault.jpg`;
+    img.loading = 'lazy';
+    div.appendChild(img);
+
+    const playIcon = document.createElement('div');
+    playIcon.className = 'play-icon';
+    playIcon.innerHTML = `<svg viewBox="0 0 12 12" fill="white"><polygon points="2,1 11,6 2,11"/></svg>`;
+    div.appendChild(playIcon);
+
+    const badge = document.createElement('div');
+    badge.className = 'video-badge';
+    badge.textContent = 'YouTube';
+    div.appendChild(badge);
+
+    const info = document.createElement('div');
+    info.className = 'video-info';
+    info.innerHTML = `<div class="video-title">${item.title}</div><div class="video-date">${item.date}</div>`;
+    div.appendChild(info);
+
+    if (!isPool) {
+      const ib = document.createElement('div');
+      ib.className = 'idx';
+      ib.textContent = idx + 1;
+      div.appendChild(ib);
+    }
   } else {
+    // Photo
     const img = document.createElement('img');
     img.src = BASE + encodeURIComponent(item.filename);
     img.loading = 'lazy';
     div.appendChild(img);
+
+    if (item.override) {
+      const ob = document.createElement('div');
+      ob.className = 'override-badge';
+      ob.textContent = item.override;
+      div.appendChild(ob);
+    }
+
+    if (!isPool) {
+      const ib = document.createElement('div');
+      ib.className = 'idx';
+      ib.textContent = idx + 1;
+      div.appendChild(ib);
+    }
+
+    const nb = document.createElement('div');
+    nb.className = 'badge';
+    nb.textContent = item.filename;
+    div.appendChild(nb);
   }
 
-  if (item.override && item.override !== 'video') {
-    const ob = document.createElement('div');
-    ob.className = 'override-badge';
-    ob.textContent = item.override;
-    div.appendChild(ob);
-  }
-
-  if (!isPool) {
-    const ib = document.createElement('div');
-    ib.className = 'idx';
-    ib.textContent = idx + 1;
-    div.appendChild(ib);
-  }
-
-  const nb = document.createElement('div');
-  nb.className = 'badge';
-  nb.textContent = item.filename.split('/').pop();
-  div.appendChild(nb);
-
+  // Click
   div.addEventListener('click', e => {
     e.stopPropagation();
     if (isPool) {
@@ -395,7 +487,7 @@ function makeThumb(item, idx, isPool) {
       return;
     }
     if (e.shiftKey && selected.size > 0) {
-      const last = Math.max(...[...selected].filter(v => typeof v === 'number'));
+      const last = Math.max(...[...selected]);
       const min = Math.min(last, idx), max = Math.max(last, idx);
       for (let i = min; i <= max; i++) selected.add(i);
     } else if (e.metaKey || e.ctrlKey) {
@@ -407,6 +499,7 @@ function makeThumb(item, idx, isPool) {
     renderGallery();
   });
 
+  // Drag
   div.addEventListener('dragstart', e => {
     dragSrcIdx = idx; dragFromPool = isPool;
     div.classList.add('dragging');
@@ -433,6 +526,7 @@ function makeThumb(item, idx, isPool) {
       renderPool(); renderGallery();
     });
   }
+
   return div;
 }
 
@@ -450,7 +544,7 @@ pp.addEventListener('dragleave', () => pp.classList.remove('drag-over'));
 pp.addEventListener('drop', e => {
   e.preventDefault(); pp.classList.remove('drag-over');
   if (!dragFromPool) {
-    const toRemove = selected.size > 1 ? [...selected].filter(v => typeof v==='number').sort((a,b)=>b-a) : [dragSrcIdx];
+    const toRemove = selected.size > 1 ? [...selected].sort((a,b)=>b-a) : [dragSrcIdx];
     toRemove.forEach(i => pool.push(gallery.splice(i, 1)[0]));
     selected.clear(); renderPool(); renderGallery();
   }
@@ -460,34 +554,37 @@ document.addEventListener('click', () => { selected.clear(); renderGallery(); })
 
 function updateControlPanel() {
   const panel = document.getElementById('control-panel');
-  const nums = [...selected].filter(v => typeof v === 'number');
-  if (nums.length === 1) {
-    const idx = nums[0];
+  if (selected.size === 1) {
+    const idx = [...selected][0];
     const item = gallery[idx];
     panel.classList.add('visible');
-    document.getElementById('sel-name').textContent = item.filename.substring(0, 45);
+    const name = item.type === 'video' ? item.title : item.filename.substring(0, 45);
+    document.getElementById('sel-name').textContent = name;
     document.getElementById('sel-pos').textContent = `${idx + 1} of ${gallery.length}`;
-    document.querySelectorAll('.override-btn').forEach(btn => {
+    // Only show photo override buttons if it's a photo
+    const overrideBtns = document.querySelectorAll('.override-btn');
+    overrideBtns.forEach(btn => {
+      btn.style.display = item.type === 'video' ? 'none' : '';
       btn.classList.toggle('active', btn.dataset.class === (item.override || ''));
     });
+    document.querySelector('[data-class=""]').style.display = item.type === 'video' ? 'none' : '';
   } else {
     panel.classList.remove('visible');
   }
 }
 
 function moveSelected(dir) {
-  const nums = [...selected].filter(v => typeof v === 'number');
-  if (nums.length !== 1) return;
-  const idx = nums[0], newIdx = idx + dir;
+  if (selected.size !== 1) return;
+  const idx = [...selected][0], newIdx = idx + dir;
   if (newIdx < 0 || newIdx >= gallery.length) return;
   [gallery[idx], gallery[newIdx]] = [gallery[newIdx], gallery[idx]];
   selected.clear(); selected.add(newIdx);
   renderGallery();
-  document.querySelectorAll('#gallery-grid .thumb')[newIdx]?.scrollIntoView({ block: 'nearest' });
+  document.querySelectorAll('#gallery-grid .thumb, #gallery-grid .video-card')[newIdx]?.scrollIntoView({ block: 'nearest' });
 }
 
 function moveSelectedTo(pos) {
-  const nums = [...selected].filter(v => typeof v==='number').sort((a,b) => b-a);
+  const nums = [...selected].sort((a,b) => b-a);
   if (!nums.length) return;
   const items = nums.map(i => gallery.splice(i, 1)[0]);
   if (pos === 0) {
@@ -504,7 +601,7 @@ function moveSelectedTo(pos) {
 }
 
 function removeSelected() {
-  const nums = [...selected].filter(v => typeof v==='number').sort((a,b) => b-a);
+  const nums = [...selected].sort((a,b) => b-a);
   nums.forEach(i => pool.push(gallery.splice(i, 1)[0]));
   selected.clear(); renderPool(); renderGallery();
 }
@@ -518,7 +615,9 @@ function selectAll() { gallery.forEach((_, i) => selected.add(i)); renderGallery
 function deselectAll() { selected.clear(); renderGallery(); }
 
 function setOverride(cls) {
-  [...selected].filter(v => typeof v==='number').forEach(i => { gallery[i].override = cls; });
+  [...selected].forEach(i => {
+    if (gallery[i].type === 'photo') gallery[i].override = cls;
+  });
   renderGallery();
 }
 
@@ -526,23 +625,31 @@ function generateCode() {
   if (!gallery.length) { alert('Gallery is empty.'); return; }
   let imgIdx = 0;
   const lines = gallery.map(item => {
-    const url = BASE + encodeURIComponent(item.filename);
-    if (item.override === 'video') {
-      return `    <div class="gallery-cell video-cell" data-type="video" data-video-id="YOUR_YOUTUBE_ID">
-      <div class="ph ph-haze">Video</div>
-      <div class="play-indicator">
-        <svg viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <circle cx="22" cy="22" r="21" stroke="white" stroke-width="1"/>
-          <polygon points="18,14 32,22 18,30" fill="white"/>
-        </svg>
+    if (item.type === 'video') {
+      return `    <!-- ${item.title} · ${item.date} -->
+    <div class="gallery-cell video-cell" data-type="video" data-video-id="${item.youtubeId}">
+      <img src="https://img.youtube.com/vi/${item.youtubeId}/mqdefault.jpg" alt="${item.title}" loading="lazy" onload="this.classList.add('loaded')">
+      <div class="video-overlay">
+        <div class="video-meta">
+          <p class="video-title-label">${item.title}</p>
+          <p class="video-date-label">${item.date}</p>
+        </div>
+        <div class="play-indicator">
+          <svg viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="22" cy="22" r="21" stroke="white" stroke-width="1"/>
+            <polygon points="18,14 32,22 18,30" fill="white"/>
+          </svg>
+        </div>
       </div>
     </div>`;
     }
     const cls = item.override ? ` ${item.override}` : '';
+    const url = BASE + encodeURIComponent(item.filename);
     return `    <div class="gallery-cell${cls}" data-index="${imgIdx++}">
       <img src="${url}" alt="Mt. Mitchell" loading="lazy" onload="this.classList.add('loaded')">
     </div>`;
   });
+
   const code = `<div class="gallery-grid" id="gallery-grid">\n\n${lines.join('\n\n')}\n\n</div>`;
   document.getElementById('output-section').style.display = 'block';
   document.getElementById('output-code').textContent = code;
@@ -558,7 +665,7 @@ function copyCode() {
 
 renderPool();
 renderGallery();
-setStatus(`${gallery.length} files loaded · Click to select · Shift+click for range · Drag to reorder`);
+setStatus(`${gallery.length} items loaded (${PHOTOS.length} photos + ${VIDEOS.length} videos) · Click to select · Drag to reorder`);
 </script>
 </body>
 </html>
