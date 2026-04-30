@@ -16,7 +16,8 @@
     --accent: #7a9aaa;
     --warm: #c08040;
     --rule: rgba(42,53,64,0.12);
-    --sans: 'system-ui', sans-serif;
+    --sans: system-ui, sans-serif;
+    --thumb: 90px;
   }
 
   body {
@@ -31,320 +32,185 @@
   header {
     background: #2a3540;
     color: rgba(210,228,236,0.85);
-    padding: 1.25rem 2rem;
+    padding: 1rem 1.5rem;
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 1rem;
     flex-wrap: wrap;
+    position: sticky;
+    top: 0;
+    z-index: 100;
   }
 
-  header h1 {
-    font-size: 15px;
-    font-weight: 400;
-    letter-spacing: 0.05em;
-  }
+  header h1 { font-size: 14px; font-weight: 400; letter-spacing: 0.05em; }
+  header p { font-size: 11px; opacity: 0.5; }
 
-  header p {
-    font-size: 12px;
-    opacity: 0.55;
-  }
-
-  .controls {
-    padding: 1.25rem 2rem;
+  .top-bar {
     background: var(--bg2);
     border-bottom: 0.5px solid var(--rule);
+    padding: 0.6rem 1.5rem;
     display: flex;
-    gap: 1rem;
-    align-items: flex-end;
+    gap: 0.5rem;
+    align-items: center;
     flex-wrap: wrap;
+    position: sticky;
+    top: 52px;
+    z-index: 99;
   }
 
-  .control-group {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-  }
-
-  .control-group label {
-    font-size: 10px;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
+  .status-bar {
+    background: var(--bg);
+    border-bottom: 0.5px solid var(--rule);
+    padding: 0.4rem 1.5rem;
+    font-size: 11px;
     color: var(--ink-light);
+    min-height: 28px;
+    display: flex;
+    align-items: center;
   }
-
-  input[type="text"] {
-    background: white;
-    border: 0.5px solid rgba(42,53,64,0.2);
-    border-radius: 6px;
-    padding: 7px 10px;
-    font-size: 13px;
-    color: var(--ink);
-    width: 380px;
-    outline: none;
-  }
-
-  input[type="text"]:focus { border-color: var(--accent); }
 
   button {
     background: #2a3540;
     color: rgba(210,228,236,0.9);
     border: none;
-    border-radius: 6px;
-    padding: 8px 16px;
-    font-size: 13px;
+    border-radius: 5px;
+    padding: 6px 12px;
+    font-size: 12px;
     cursor: pointer;
     white-space: nowrap;
   }
-
   button:hover { background: #3a4a58; }
-  button:disabled { opacity: 0.4; cursor: default; }
+  button:disabled { opacity: 0.35; cursor: default; }
 
   button.secondary {
     background: white;
     color: var(--ink);
     border: 0.5px solid rgba(42,53,64,0.2);
   }
-
   button.secondary:hover { background: var(--bg2); }
 
-  button.warm {
-    background: var(--warm);
-    color: white;
-  }
-
+  button.warm { background: var(--warm); color: white; }
   button.warm:hover { background: #a06030; }
 
-  .status {
-    padding: 0.75rem 2rem;
-    font-size: 12px;
-    color: var(--ink-light);
-    border-bottom: 0.5px solid var(--rule);
-    min-height: 36px;
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    flex-wrap: wrap;
-  }
+  button.sm { padding: 4px 8px; font-size: 11px; }
 
-  .status span { color: var(--ink-mid); }
-
-  /* Unplaced pool */
-  #pool-section {
-    padding: 1.25rem 2rem 0.5rem;
-  }
-
-  #pool-section h2 {
-    font-size: 10px;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    color: var(--ink-light);
-    margin-bottom: 1rem;
-  }
-
-  #pool {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
-    min-height: 80px;
-    padding: 10px;
-    background: white;
-    border: 0.5px solid var(--rule);
-    border-radius: 8px;
-  }
-
-  #pool.drag-over {
-    border-color: var(--accent);
-    background: #f0f6f8;
-  }
-
-  /* Gallery arrangement */
-  #gallery-section {
-    padding: 1.25rem 2rem 2rem;
-  }
-
-  #gallery-section h2 {
-    font-size: 10px;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    color: var(--ink-light);
-    margin-bottom: 1rem;
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-  }
-
-  #gallery-drop {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 4px;
-    min-height: 200px;
-    padding: 6px;
-    background: white;
-    border: 0.5px solid var(--rule);
-    border-radius: 8px;
-  }
-
-  #gallery-drop.drag-over {
-    border-color: var(--accent);
-  }
-
-  /* Thumb cards */
-  .thumb {
-    position: relative;
-    background: #d0d8dc;
-    border-radius: 4px;
-    overflow: hidden;
-    cursor: grab;
-    user-select: none;
-    border: 1.5px solid transparent;
-    transition: border-color 0.15s, transform 0.15s;
-  }
-
-  .thumb:active { cursor: grabbing; transform: scale(0.97); }
-  .thumb.selected { border-color: var(--warm); }
-  .thumb.dragging { opacity: 0.4; }
-
-  /* Pool thumbs are smaller */
-  #pool .thumb {
-    width: 80px;
-    height: 80px;
-    flex-shrink: 0;
-  }
-
-  /* Gallery thumbs fill grid cell */
-  #gallery-drop .thumb {
-    aspect-ratio: 1;
-    width: 100%;
-  }
-
-  #gallery-drop .thumb.wide  { grid-column: span 2; aspect-ratio: 2/1; }
-  #gallery-drop .thumb.full  { grid-column: span 3; aspect-ratio: 3/1; }
-  #gallery-drop .thumb.tall  { grid-row: span 2; aspect-ratio: 1/2; }
-  #gallery-drop .thumb.featured { grid-column: span 2; grid-row: span 2; aspect-ratio: 1; }
-
-  .thumb img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-    pointer-events: none;
-  }
-
-  .thumb .thumb-name {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    background: rgba(18,24,28,0.7);
-    color: rgba(220,235,240,0.9);
-    font-size: 9px;
-    padding: 3px 5px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    opacity: 0;
-    transition: opacity 0.2s;
-  }
-
-  .thumb:hover .thumb-name { opacity: 1; }
-
-  /* Video badge */
-  .thumb .video-badge {
-    position: absolute;
-    top: 4px;
-    left: 4px;
-    background: rgba(192,128,64,0.85);
-    color: white;
-    font-size: 8px;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    padding: 2px 5px;
-    border-radius: 3px;
-  }
-
-  /* Override controls shown when thumb is selected */
-  #override-panel {
+  #control-panel {
     display: none;
-    padding: 0.75rem 2rem;
     background: #fdf8f2;
-    border-top: 0.5px solid rgba(192,128,64,0.2);
-    border-bottom: 0.5px solid rgba(192,128,64,0.2);
-    gap: 0.75rem;
+    border-bottom: 0.5px solid rgba(192,128,64,0.25);
+    padding: 0.5rem 1.5rem;
+    gap: 0.5rem;
     align-items: center;
     flex-wrap: wrap;
+    position: sticky;
+    top: 88px;
+    z-index: 98;
   }
+  #control-panel.visible { display: flex; }
+  #control-panel p { font-size: 11px; color: var(--ink-mid); margin-right: 0.5rem; }
 
-  #override-panel.visible { display: flex; }
-
-  #override-panel p {
-    font-size: 12px;
-    color: var(--ink-mid);
-  }
+  .sep { width: 1px; height: 20px; background: var(--rule); margin: 0 4px; }
 
   .override-btn {
-    font-size: 11px;
-    padding: 4px 10px;
-    border-radius: 4px;
-    background: white;
-    color: var(--ink);
-    border: 0.5px solid rgba(42,53,64,0.2);
-    cursor: pointer;
+    font-size: 11px; padding: 4px 9px; border-radius: 4px;
+    background: white; color: var(--ink);
+    border: 0.5px solid rgba(42,53,64,0.2); cursor: pointer;
   }
-
   .override-btn:hover { background: var(--bg2); }
   .override-btn.active { background: var(--warm); color: white; border-color: var(--warm); }
 
-  /* Drop placeholder in gallery */
-  .drop-placeholder {
-    border: 1.5px dashed var(--accent);
-    border-radius: 4px;
-    background: #f0f6f8;
-    aspect-ratio: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 10px;
-    color: var(--accent);
-    letter-spacing: 0.1em;
+  #pool-section {
+    padding: 0.75rem 1.5rem 0.5rem;
+    border-bottom: 0.5px solid var(--rule);
+  }
+  #pool-section h2 {
+    font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--ink-light); margin-bottom: 0.5rem;
+  }
+  #pool {
+    display: flex; flex-wrap: wrap; gap: 4px;
+    min-height: 50px; padding: 6px;
+    background: white; border: 0.5px solid var(--rule); border-radius: 6px;
+  }
+  #pool.drag-over { border-color: var(--accent); background: #f0f6f8; }
+
+  #gallery-section { padding: 0.75rem 1.5rem 3rem; }
+  #gallery-section h2 {
+    font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--ink-light); margin-bottom: 0.5rem;
+    display: flex; align-items: center; gap: 0.75rem;
+  }
+  #gallery-section h2 span {
+    font-weight: 400; text-transform: none; letter-spacing: 0;
+    font-size: 11px; color: var(--ink-light); opacity: 0.7;
   }
 
-  /* Output */
-  #output-section {
-    padding: 1.25rem 2rem 3rem;
-    display: none;
+  #gallery-grid {
+    display: flex; flex-wrap: wrap; gap: 4px;
+    min-height: 100px; padding: 6px;
+    background: white; border: 0.5px solid var(--rule); border-radius: 6px;
+  }
+  #gallery-grid.drag-over { border-color: var(--accent); }
+
+  .thumb {
+    position: relative;
+    width: var(--thumb); height: var(--thumb);
+    background: #b0c0c8; border-radius: 3px; overflow: hidden;
+    cursor: grab; user-select: none;
+    border: 2px solid transparent;
+    transition: border-color 0.12s, transform 0.12s;
+    flex-shrink: 0;
+  }
+  .thumb:active { cursor: grabbing; }
+  .thumb.selected { border-color: var(--warm); }
+  .thumb.dragging { opacity: 0.35; transform: scale(0.95); }
+  .thumb.drag-target { border-color: var(--accent); }
+
+  #pool .thumb { width: 70px; height: 70px; }
+
+  .thumb img { width: 100%; height: 100%; object-fit: cover; display: block; pointer-events: none; }
+
+  .thumb .badge {
+    position: absolute; bottom: 0; left: 0; right: 0;
+    background: rgba(18,24,28,0.65); color: rgba(220,235,240,0.9);
+    font-size: 8px; padding: 2px 4px;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    opacity: 0; transition: opacity 0.15s;
+  }
+  .thumb:hover .badge { opacity: 1; }
+
+  .thumb .override-badge {
+    position: absolute; top: 3px; right: 3px;
+    background: rgba(192,128,64,0.85); color: white;
+    font-size: 7px; padding: 1px 4px; border-radius: 2px; text-transform: uppercase;
   }
 
+  .thumb .video-badge {
+    position: absolute; top: 3px; left: 3px;
+    background: rgba(42,53,64,0.8); color: white;
+    font-size: 7px; padding: 1px 4px; border-radius: 2px; text-transform: uppercase;
+  }
+
+  .thumb .idx {
+    position: absolute; bottom: 3px; right: 3px;
+    background: rgba(18,24,28,0.5); color: rgba(255,255,255,0.8);
+    font-size: 8px; padding: 1px 3px; border-radius: 2px; line-height: 1.2;
+  }
+
+  .empty-msg { font-size: 12px; color: var(--ink-light); padding: 1rem; letter-spacing: 0.05em; }
+
+  #output-section { padding: 1rem 1.5rem 3rem; display: none; }
   #output-section h2 {
-    font-size: 10px;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    color: var(--ink-light);
-    margin-bottom: 0.75rem;
+    font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--ink-light); margin-bottom: 0.5rem;
   }
-
   #output-code {
-    background: #1e2a30;
-    color: #b0d0d8;
-    font-family: monospace;
-    font-size: 12px;
-    line-height: 1.6;
-    padding: 1.25rem;
-    border-radius: 8px;
-    white-space: pre-wrap;
-    word-break: break-all;
-    max-height: 400px;
-    overflow-y: auto;
-  }
-
-  .empty-state {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 160px;
-    font-size: 12px;
-    color: var(--ink-light);
-    letter-spacing: 0.1em;
+    background: #1e2a30; color: #b0d0d8;
+    font-family: monospace; font-size: 11px; line-height: 1.6;
+    padding: 1rem; border-radius: 6px;
+    white-space: pre-wrap; word-break: break-all;
+    max-height: 360px; overflow-y: auto;
   }
 </style>
 </head>
@@ -353,376 +219,316 @@
 <header>
   <div>
     <h1>Gallery Sorter — 6,684 Feet</h1>
-    <p>Arrange your photos and videos, set overrides, then copy the generated code</p>
+    <p>All images auto-loaded · Click to select · Drag or use arrow buttons to reorder</p>
   </div>
+  <button class="warm" onclick="generateCode()">Generate code ↗</button>
 </header>
 
-<div class="controls">
-  <div class="control-group">
-    <label>Backblaze base URL</label>
-    <input type="text" id="base-url" value="https://s3.us-east-005.backblazeb2.com/mtmitchell/" placeholder="https://s3.us-east-005.backblazeb2.com/mtmitchell/">
-  </div>
-  <button id="load-btn" onclick="loadFiles()">Load Files</button>
-  <button class="secondary" onclick="clearGallery()">Clear gallery</button>
-  <button class="warm" onclick="generateCode()">Generate code ↗</button>
+<div class="top-bar">
+  <button class="secondary sm" onclick="selectAll()">Select all</button>
+  <button class="secondary sm" onclick="deselectAll()">Deselect</button>
+  <div class="sep"></div>
+  <button class="secondary sm" onclick="moveSelectedTo(0)">↑ To top</button>
+  <button class="secondary sm" onclick="moveSelectedTo(-1)">↓ To bottom</button>
+  <div class="sep"></div>
+  <button class="secondary sm" onclick="removeSelected()">Remove selected to pool</button>
+  <button class="secondary sm" onclick="addAllFromPool()">Add all from pool</button>
+  <div class="sep"></div>
+  <button class="secondary sm" onclick="copyCode()">Copy generated code</button>
 </div>
 
-<div class="status" id="status">
-  <span>Enter your Backblaze base URL and click Load Files</span>
-</div>
-
-<div id="override-panel">
-  <p>Selected: <strong id="selected-name">—</strong></p>
-  <button class="override-btn active" data-class="" onclick="setOverride('')">Square (default)</button>
-  <button class="override-btn" data-class="wide" onclick="setOverride('wide')">Wide (2 col)</button>
+<div id="control-panel">
+  <p>Selected: <strong id="sel-name">—</strong> &nbsp;·&nbsp; Position: <strong id="sel-pos">—</strong></p>
+  <button class="sm secondary" onclick="moveSelected(-1)">← Move left</button>
+  <button class="sm secondary" onclick="moveSelected(1)">Move right →</button>
+  <div class="sep"></div>
+  <span style="font-size:11px; color:var(--ink-light); margin-right:4px;">Layout:</span>
+  <button class="override-btn active" data-class="" onclick="setOverride('')">Square</button>
+  <button class="override-btn" data-class="wide" onclick="setOverride('wide')">Wide (2col)</button>
   <button class="override-btn" data-class="full" onclick="setOverride('full')">Full width</button>
-  <button class="override-btn" data-class="tall" onclick="setOverride('tall')">Tall (2 row)</button>
+  <button class="override-btn" data-class="tall" onclick="setOverride('tall')">Tall (2row)</button>
   <button class="override-btn" data-class="featured" onclick="setOverride('featured')">Featured (2×2)</button>
+  <div class="sep"></div>
   <button class="override-btn" data-class="video" onclick="setOverride('video')">Mark as video</button>
-  <button class="secondary" style="margin-left:auto;" onclick="removeSelected()">Remove from gallery</button>
 </div>
+
+<div class="status-bar" id="status-bar"></div>
 
 <div id="pool-section">
-  <h2>Unplaced files — drag into gallery below, or click to add</h2>
-  <div id="pool">
-    <div class="empty-state">Load files to begin</div>
-  </div>
+  <h2>Pool — unplaced files</h2>
+  <div id="pool"><span class="empty-msg">All files placed in gallery</span></div>
 </div>
 
 <div id="gallery-section">
-  <h2>
-    Gallery order
-    <span style="font-weight:400; text-transform:none; letter-spacing:0; font-size:11px; color:var(--ink-light);">Drag to reorder · Click to select · Use override panel to adjust layout</span>
-  </h2>
-  <div id="gallery-drop">
-    <div class="empty-state" id="gallery-empty">Drag files here to arrange your gallery</div>
-  </div>
+  <h2>Gallery order <span>Click to select · Shift+click for range · Drag to reorder</span></h2>
+  <div id="gallery-grid"></div>
 </div>
 
 <div id="output-section">
-  <h2>Generated gallery code — paste into mitchell.html</h2>
+  <h2>Generated code — paste into index.html replacing the gallery-grid div</h2>
   <pre id="output-code"></pre>
   <button onclick="copyCode()" style="margin-top:0.75rem;">Copy to clipboard</button>
 </div>
 
 <script>
-  const BASE_URL_DEFAULT = 'https://s3.us-east-005.backblazeb2.com/mtmitchell/';
-  const IMAGE_EXTS = ['jpg','jpeg','png','webp','gif','heic'];
-  const VIDEO_EXTS = ['mp4','mov','m4v','webm'];
+const BASE = 'https://s3.us-east-005.backblazeb2.com/mtmitchell/';
+const VIDEO_EXTS = ['mp4','mov','m4v','webm'];
 
-  let allFiles = [];
-  let galleryItems = []; // {filename, override}
-  let selectedThumb = null;
-  let dragSrc = null;
-  let dragFromPool = false;
+const ALL_FILES = [
+  '0C9AFE49-0345-49C3-9173-95DDBF9738542022-10-23_11-37-12_729.jpeg',
+  '4C072CB8-39B8-4FF6-B494-864AFEE7FF6F2022-10-23_11-44-57_175.jpeg',
+  '7FD9E045-93B6-4371-9BBA-846871CAE3F328899061161_48ac818451_o.jpg',
+  '23FD5665-62AA-47E9-B3E9-F5098B73FCA328899618141_9e7e0cba11_o.jpg',
+  '72D72FE9-3AC4C89-A57B-464026DA49A5346882640344_66e49b0bd0_o.jpg',
+  '122DE275-6732-4D8B-879C-9CE709A99A022022-10-23_10-48-28_459.jpeg',
+  '620D121A-01DA-4435-B680-AE1A7B2F7F3828871027652_763858f2b8_o.jpg',
+  '779BC693-781B-4BCA-908F-70CC718C95BA35362341852_b6b3bf464f_o_34784192153_o.jpg',
+  '874DF94F-1DB3-402E-8653-2F8D9B38706735397109591_760228cabd_o.jpg',
+  '2242F918-E53E-458C-BC71-F4C81296EE6128870960302_bc103e0d44_o.jpg',
+  '40561E70-5212-4819-9A5F-E03C592ED14F2022-10-23_10-47-28_072.jpeg',
+  '28359307213_b55fe8035f_o.jpg',
+  '28870907852_6835441bb7_o.jpg',
+  '28943522256_fb4d140ea1_o.jpg',
+  '28975382015_fa3646cde1_o.jpg',
+  '28975382975_864de72aeb_o.jpg',
+  '30513965882_d55f167052_o.JPG',
+  '30594969976_8c7766ccff_o.JPG',
+  '35527968665_2af45f4333_o.JPG',
+  'A974B932-B8D6-4264-8533-31142CBA692234688258714_92ba343e67_o.jpg',
+  'A2909AEA-82B5-4722-8BC3-8ED2B954495528870877912_59d01f74e3_o.jpg',
+  'C44BF404-5A97-4F0E-9385-4ACF6D7F672628943548526_8e5b27aefa_o.jpg',
+  'E533D178-9E53-4728-AB0C-9EDCBF5691FE28690058330_727c4373b1_o.jpg',
+  'F4E5EB42-5476-44F2-BB54-6800E174A7FA35398926091_fc2bf18c8d_o.jpg',
+  'F830606B-DCF5-4C4C-8FC4-18BC7731107B28690003400_e39d4cf46a_o.jpg',
+  'IMG_1016.JPG','IMG_1041.JPG','IMG_2148.jpeg','IMG_5175.JPG',
+  'IMG_6197.jpeg','IMG_6259.jpeg','IMG_6360.jpeg','IMG_6867.JPG',
+  'IMG_6899.JPG','IMG_6922.JPG','IMG_6926.JPG','IMG_6939.JPG',
+  'IMG_6961.JPG','IMG_6968.JPG','IMG_6982.JPG','IMG_7002.JPG',
+  'IMG_7029.jpg','IMG_7087.JPG','IMG_7133.JPG','IMG_7310.JPG',
+  'IMG_7322.JPG','IMG_7329.JPG','IMG_7548.JPG','IMG_7680.JPG',
+  'IMG_7681.JPG','IMG_7713.JPG','IMG_7716.JPG','IMG_7728.JPG',
+  'IMG_7734.JPG','IMG_7745.JPG','IMG_7753.JPG','IMG_9408.JPG',
+  'IMG_9742.JPG','PXL_20240915_134927818_Original.jpg'
+];
 
-  function getBaseUrl() {
-    let url = document.getElementById('base-url').value.trim();
-    if (!url.endsWith('/')) url += '/';
-    return url;
+let gallery = ALL_FILES.map(f => ({ filename: f, override: isVid(f) ? 'video' : '' }));
+let pool = [];
+let selected = new Set();
+let dragSrcIdx = null;
+let dragFromPool = false;
+
+function isVid(f) {
+  return VIDEO_EXTS.includes(f.split('.').pop().toLowerCase());
+}
+
+function setStatus(msg) {
+  document.getElementById('status-bar').textContent = msg;
+}
+
+function renderPool() {
+  const el = document.getElementById('pool');
+  if (pool.length === 0) {
+    el.innerHTML = '<span class="empty-msg">All files placed in gallery</span>';
+    return;
+  }
+  el.innerHTML = '';
+  pool.forEach((item, i) => el.appendChild(makeThumb(item, i, true)));
+}
+
+function renderGallery() {
+  const el = document.getElementById('gallery-grid');
+  el.innerHTML = '';
+  if (gallery.length === 0) {
+    el.innerHTML = '<span class="empty-msg">Drag files here from the pool above</span>';
+    updateControlPanel();
+    return;
+  }
+  gallery.forEach((item, i) => el.appendChild(makeThumb(item, i, false)));
+  updateControlPanel();
+  setStatus(`${gallery.length} in gallery · ${pool.length} in pool · ${selected.size} selected`);
+}
+
+function makeThumb(item, idx, isPool) {
+  const div = document.createElement('div');
+  const selKey = isPool ? 'p'+idx : idx;
+  div.className = 'thumb' + (selected.has(selKey) ? ' selected' : '');
+  div.dataset.idx = idx;
+  div.draggable = true;
+
+  if (isVid(item.filename)) {
+    div.style.background = '#3a4e5a';
+    const vb = document.createElement('div');
+    vb.className = 'video-badge';
+    vb.textContent = 'video';
+    div.appendChild(vb);
+  } else {
+    const img = document.createElement('img');
+    img.src = BASE + encodeURIComponent(item.filename);
+    img.loading = 'lazy';
+    div.appendChild(img);
   }
 
-  async function loadFiles() {
-    const base = getBaseUrl();
-    setStatus('Loading files from Backblaze...');
-    document.getElementById('load-btn').disabled = true;
-
-    // Try S3-compatible ListObjects
-    const listUrl = base.replace(/\/[^/]+\/?$/, '') + '?list-type=2&max-keys=200';
-    // Actually use the bucket list endpoint
-    const bucketName = base.split('/').filter(Boolean).pop();
-    const endpoint = base.split('/').slice(0,3).join('/');
-    const apiUrl = `${endpoint}/${bucketName}?list-type=2&max-keys=200`;
-
-    try {
-      const res = await fetch(apiUrl);
-      const text = await res.text();
-      const parser = new DOMParser();
-      const xml = parser.parseFromString(text, 'application/xml');
-      const keys = [...xml.querySelectorAll('Key')].map(k => k.textContent);
-
-      if (keys.length === 0) throw new Error('No files found');
-
-      allFiles = keys.filter(k => {
-        const ext = k.split('.').pop().toLowerCase();
-        return IMAGE_EXTS.includes(ext) || VIDEO_EXTS.includes(ext);
-      });
-
-      setStatus(`Loaded ${allFiles.length} files. Drag them into the gallery below.`);
-      renderPool();
-    } catch(e) {
-      setStatus(`Could not auto-fetch file list (${e.message}). Paste filenames manually below.`);
-      showManualEntry();
-    }
-
-    document.getElementById('load-btn').disabled = false;
+  if (item.override && item.override !== 'video') {
+    const ob = document.createElement('div');
+    ob.className = 'override-badge';
+    ob.textContent = item.override;
+    div.appendChild(ob);
   }
 
-  function showManualEntry() {
-    const status = document.getElementById('status');
-    const input = document.createElement('input');
-    input.type = 'text';
-    input.placeholder = 'Paste comma-separated filenames, e.g. IMG_001.jpg, IMG_002.jpg';
-    input.style.flex = '1';
-    input.style.marginLeft = '1rem';
-    const btn = document.createElement('button');
-    btn.textContent = 'Add';
-    btn.onclick = () => {
-      const names = input.value.split(',').map(s => s.trim()).filter(Boolean);
-      allFiles = [...new Set([...allFiles, ...names])];
-      renderPool();
-      setStatus(`${allFiles.length} files loaded.`);
-    };
-    status.appendChild(input);
-    status.appendChild(btn);
+  if (!isPool) {
+    const ib = document.createElement('div');
+    ib.className = 'idx';
+    ib.textContent = idx + 1;
+    div.appendChild(ib);
   }
 
-  function isVideo(filename) {
-    const ext = filename.split('.').pop().toLowerCase();
-    return VIDEO_EXTS.includes(ext);
-  }
+  const nb = document.createElement('div');
+  nb.className = 'badge';
+  nb.textContent = item.filename.split('/').pop();
+  div.appendChild(nb);
 
-  function renderPool() {
-    const pool = document.getElementById('pool');
-    const inGallery = new Set(galleryItems.map(i => i.filename));
-    const unplaced = allFiles.filter(f => !inGallery.has(f));
-
-    if (unplaced.length === 0) {
-      pool.innerHTML = '<div class="empty-state">All files placed in gallery</div>';
-      return;
-    }
-
-    pool.innerHTML = '';
-    unplaced.forEach(filename => {
-      pool.appendChild(makeThumb(filename, '', true));
-    });
-  }
-
-  function renderGallery() {
-    const drop = document.getElementById('gallery-drop');
-    const empty = document.getElementById('gallery-empty');
-
-    if (galleryItems.length === 0) {
-      drop.innerHTML = '';
-      drop.appendChild(empty || makeEmptyState());
-      return;
-    }
-
-    drop.innerHTML = '';
-    galleryItems.forEach((item, idx) => {
-      const thumb = makeThumb(item.filename, item.override, false);
-      thumb.dataset.galleryIndex = idx;
-      drop.appendChild(thumb);
-    });
-  }
-
-  function makeThumb(filename, override, isPool) {
-    const base = getBaseUrl();
-    const div = document.createElement('div');
-    div.className = 'thumb' + (override ? ' ' + override : '');
-    div.dataset.filename = filename;
-    div.dataset.override = override || '';
-    div.draggable = true;
-
-    const vid = isVideo(filename);
-
-    if (vid) {
-      // Video — show colored placeholder with badge
-      div.style.background = '#3a4e5a';
-      const badge = document.createElement('div');
-      badge.className = 'video-badge';
-      badge.textContent = 'video';
-      div.appendChild(badge);
-    } else {
-      const img = document.createElement('img');
-      img.src = base + encodeURIComponent(filename);
-      img.alt = filename;
-      img.loading = 'lazy';
-      div.appendChild(img);
-    }
-
-    const name = document.createElement('div');
-    name.className = 'thumb-name';
-    name.textContent = filename;
-    div.appendChild(name);
-
-    // Click to select
-    div.addEventListener('click', () => selectThumb(div, filename, override, isPool));
-
-    // Drag events
-    div.addEventListener('dragstart', e => {
-      dragSrc = div;
-      dragFromPool = isPool;
-      div.classList.add('dragging');
-      e.dataTransfer.effectAllowed = 'move';
-      e.dataTransfer.setData('text/plain', filename + '|' + (override||'') + '|' + (isPool ? 'pool' : 'gallery'));
-    });
-
-    div.addEventListener('dragend', () => {
-      div.classList.remove('dragging');
-      dragSrc = null;
-    });
-
-    if (!isPool) {
-      div.addEventListener('dragover', e => {
-        e.preventDefault();
-        e.dataTransfer.dropEffect = 'move';
-      });
-
-      div.addEventListener('drop', e => {
-        e.preventDefault();
-        e.stopPropagation();
-        const data = e.dataTransfer.getData('text/plain').split('|');
-        const srcFilename = data[0];
-        const srcOverride = data[1];
-        const srcFrom = data[2];
-        const targetIdx = parseInt(div.dataset.galleryIndex);
-
-        if (srcFrom === 'pool') {
-          // Add from pool before this item
-          galleryItems.splice(targetIdx, 0, { filename: srcFilename, override: srcOverride });
-        } else {
-          // Reorder within gallery
-          const srcIdx = galleryItems.findIndex(i => i.filename === srcFilename);
-          if (srcIdx !== -1 && srcIdx !== targetIdx) {
-            const [item] = galleryItems.splice(srcIdx, 1);
-            const newTarget = srcIdx < targetIdx ? targetIdx - 1 : targetIdx;
-            galleryItems.splice(newTarget, 0, item);
-          }
-        }
-        renderPool();
-        renderGallery();
-        deselect();
-      });
-    }
-
-    // Pool click-to-add
+  div.addEventListener('click', e => {
+    e.stopPropagation();
     if (isPool) {
-      div.addEventListener('dblclick', () => {
-        galleryItems.push({ filename, override: isVideo(filename) ? 'video' : '' });
-        renderPool();
-        renderGallery();
-      });
-    }
-
-    return div;
-  }
-
-  // Drop on gallery background
-  const galleryDrop = document.getElementById('gallery-drop');
-
-  galleryDrop.addEventListener('dragover', e => {
-    e.preventDefault();
-    galleryDrop.classList.add('drag-over');
-  });
-
-  galleryDrop.addEventListener('dragleave', () => galleryDrop.classList.remove('drag-over'));
-
-  galleryDrop.addEventListener('drop', e => {
-    e.preventDefault();
-    galleryDrop.classList.remove('drag-over');
-    const data = e.dataTransfer.getData('text/plain').split('|');
-    const srcFilename = data[0];
-    const srcOverride = data[1];
-    const srcFrom = data[2];
-
-    if (srcFrom === 'pool') {
-      const override = isVideo(srcFilename) ? 'video' : (srcOverride || '');
-      if (!galleryItems.find(i => i.filename === srcFilename)) {
-        galleryItems.push({ filename: srcFilename, override });
-      }
-    }
-    renderPool();
-    renderGallery();
-  });
-
-  // Pool drop (remove from gallery back to pool)
-  const pool = document.getElementById('pool');
-  pool.addEventListener('dragover', e => { e.preventDefault(); pool.classList.add('drag-over'); });
-  pool.addEventListener('dragleave', () => pool.classList.remove('drag-over'));
-  pool.addEventListener('drop', e => {
-    e.preventDefault();
-    pool.classList.remove('drag-over');
-    const data = e.dataTransfer.getData('text/plain').split('|');
-    const srcFilename = data[0];
-    const srcFrom = data[2];
-    if (srcFrom === 'gallery') {
-      galleryItems = galleryItems.filter(i => i.filename !== srcFilename);
-      renderPool();
-      renderGallery();
-      deselect();
-    }
-  });
-
-  function selectThumb(div, filename, override, isPool) {
-    if (selectedThumb) selectedThumb.classList.remove('selected');
-    selectedThumb = div;
-    div.classList.add('selected');
-
-    if (!isPool) {
-      document.getElementById('override-panel').classList.add('visible');
-      document.getElementById('selected-name').textContent = filename;
-      // Highlight active override button
-      document.querySelectorAll('.override-btn').forEach(btn => {
-        btn.classList.toggle('active', btn.dataset.class === (override || ''));
-      });
-    }
-  }
-
-  function deselect() {
-    if (selectedThumb) selectedThumb.classList.remove('selected');
-    selectedThumb = null;
-    document.getElementById('override-panel').classList.remove('visible');
-  }
-
-  function setOverride(cls) {
-    if (!selectedThumb) return;
-    const filename = selectedThumb.dataset.filename;
-    const item = galleryItems.find(i => i.filename === filename);
-    if (item) {
-      item.override = cls;
-      renderGallery();
-      // Re-select
-      const newThumb = document.querySelector(`#gallery-drop .thumb[data-filename="${CSS.escape(filename)}"]`);
-      if (newThumb) selectThumb(newThumb, filename, cls, false);
-    }
-    document.querySelectorAll('.override-btn').forEach(btn => {
-      btn.classList.toggle('active', btn.dataset.class === cls);
-    });
-  }
-
-  function removeSelected() {
-    if (!selectedThumb) return;
-    const filename = selectedThumb.dataset.filename;
-    galleryItems = galleryItems.filter(i => i.filename !== filename);
-    renderPool();
-    renderGallery();
-    deselect();
-  }
-
-  function clearGallery() {
-    galleryItems = [];
-    renderPool();
-    renderGallery();
-    deselect();
-  }
-
-  function generateCode() {
-    if (galleryItems.length === 0) {
-      alert('Add some items to the gallery first.');
+      gallery.push(pool.splice(idx, 1)[0]);
+      renderPool(); renderGallery();
       return;
     }
+    if (e.shiftKey && selected.size > 0) {
+      const last = Math.max(...[...selected].filter(v => typeof v === 'number'));
+      const min = Math.min(last, idx), max = Math.max(last, idx);
+      for (let i = min; i <= max; i++) selected.add(i);
+    } else if (e.metaKey || e.ctrlKey) {
+      selected.has(idx) ? selected.delete(idx) : selected.add(idx);
+    } else {
+      selected.clear();
+      selected.add(idx);
+    }
+    renderGallery();
+  });
 
-    const base = getBaseUrl();
-    let idx = 0;
-    const lines = galleryItems.map(item => {
-      const url = base + encodeURIComponent(item.filename);
-      const cls = item.override ? ` ${item.override}` : '';
+  div.addEventListener('dragstart', e => {
+    dragSrcIdx = idx; dragFromPool = isPool;
+    div.classList.add('dragging');
+    e.dataTransfer.effectAllowed = 'move';
+  });
+  div.addEventListener('dragend', () => div.classList.remove('dragging'));
 
-      if (item.override === 'video') {
-        // YouTube embed placeholder
-        return `    <!-- VIDEO: ${item.filename} -->
-    <div class="gallery-cell video-cell${cls.replace('video','').trim() ? ' '+cls.trim() : ''}" data-type="video" data-video-id="YOUR_YOUTUBE_ID">
+  if (!isPool) {
+    div.addEventListener('dragover', e => { e.preventDefault(); div.classList.add('drag-target'); });
+    div.addEventListener('dragleave', () => div.classList.remove('drag-target'));
+    div.addEventListener('drop', e => {
+      e.preventDefault(); e.stopPropagation();
+      div.classList.remove('drag-target');
+      const targetIdx = parseInt(div.dataset.idx);
+      if (dragFromPool) {
+        const [item] = pool.splice(dragSrcIdx, 1);
+        gallery.splice(targetIdx, 0, item);
+      } else if (dragSrcIdx !== targetIdx) {
+        const [item] = gallery.splice(dragSrcIdx, 1);
+        const t = dragSrcIdx < targetIdx ? targetIdx - 1 : targetIdx;
+        gallery.splice(t, 0, item);
+        selected.clear(); selected.add(t);
+      }
+      renderPool(); renderGallery();
+    });
+  }
+  return div;
+}
+
+const gg = document.getElementById('gallery-grid');
+gg.addEventListener('dragover', e => { e.preventDefault(); gg.classList.add('drag-over'); });
+gg.addEventListener('dragleave', () => gg.classList.remove('drag-over'));
+gg.addEventListener('drop', e => {
+  e.preventDefault(); gg.classList.remove('drag-over');
+  if (dragFromPool) { gallery.push(pool.splice(dragSrcIdx, 1)[0]); renderPool(); renderGallery(); }
+});
+
+const pp = document.getElementById('pool');
+pp.addEventListener('dragover', e => { e.preventDefault(); pp.classList.add('drag-over'); });
+pp.addEventListener('dragleave', () => pp.classList.remove('drag-over'));
+pp.addEventListener('drop', e => {
+  e.preventDefault(); pp.classList.remove('drag-over');
+  if (!dragFromPool) {
+    const toRemove = selected.size > 1 ? [...selected].filter(v => typeof v==='number').sort((a,b)=>b-a) : [dragSrcIdx];
+    toRemove.forEach(i => pool.push(gallery.splice(i, 1)[0]));
+    selected.clear(); renderPool(); renderGallery();
+  }
+});
+
+document.addEventListener('click', () => { selected.clear(); renderGallery(); });
+
+function updateControlPanel() {
+  const panel = document.getElementById('control-panel');
+  const nums = [...selected].filter(v => typeof v === 'number');
+  if (nums.length === 1) {
+    const idx = nums[0];
+    const item = gallery[idx];
+    panel.classList.add('visible');
+    document.getElementById('sel-name').textContent = item.filename.substring(0, 45);
+    document.getElementById('sel-pos').textContent = `${idx + 1} of ${gallery.length}`;
+    document.querySelectorAll('.override-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.class === (item.override || ''));
+    });
+  } else {
+    panel.classList.remove('visible');
+  }
+}
+
+function moveSelected(dir) {
+  const nums = [...selected].filter(v => typeof v === 'number');
+  if (nums.length !== 1) return;
+  const idx = nums[0], newIdx = idx + dir;
+  if (newIdx < 0 || newIdx >= gallery.length) return;
+  [gallery[idx], gallery[newIdx]] = [gallery[newIdx], gallery[idx]];
+  selected.clear(); selected.add(newIdx);
+  renderGallery();
+  document.querySelectorAll('#gallery-grid .thumb')[newIdx]?.scrollIntoView({ block: 'nearest' });
+}
+
+function moveSelectedTo(pos) {
+  const nums = [...selected].filter(v => typeof v==='number').sort((a,b) => b-a);
+  if (!nums.length) return;
+  const items = nums.map(i => gallery.splice(i, 1)[0]);
+  if (pos === 0) {
+    gallery.unshift(...items.reverse());
+    selected.clear();
+    items.forEach((_, i) => selected.add(i));
+  } else {
+    gallery.push(...items.reverse());
+    selected.clear();
+    const len = gallery.length;
+    items.forEach((_, i) => selected.add(len - items.length + i));
+  }
+  renderGallery();
+}
+
+function removeSelected() {
+  const nums = [...selected].filter(v => typeof v==='number').sort((a,b) => b-a);
+  nums.forEach(i => pool.push(gallery.splice(i, 1)[0]));
+  selected.clear(); renderPool(); renderGallery();
+}
+
+function addAllFromPool() {
+  gallery.push(...pool); pool = [];
+  renderPool(); renderGallery();
+}
+
+function selectAll() { gallery.forEach((_, i) => selected.add(i)); renderGallery(); }
+function deselectAll() { selected.clear(); renderGallery(); }
+
+function setOverride(cls) {
+  [...selected].filter(v => typeof v==='number').forEach(i => { gallery[i].override = cls; });
+  renderGallery();
+}
+
+function generateCode() {
+  if (!gallery.length) { alert('Gallery is empty.'); return; }
+  let imgIdx = 0;
+  const lines = gallery.map(item => {
+    const url = BASE + encodeURIComponent(item.filename);
+    if (item.override === 'video') {
+      return `    <div class="gallery-cell video-cell" data-type="video" data-video-id="YOUR_YOUTUBE_ID">
       <div class="ph ph-haze">Video</div>
       <div class="play-indicator">
         <svg viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -731,83 +537,28 @@
         </svg>
       </div>
     </div>`;
-      } else {
-        const dataIdx = idx++;
-        return `    <div class="gallery-cell${cls}" data-index="${dataIdx}">
+    }
+    const cls = item.override ? ` ${item.override}` : '';
+    return `    <div class="gallery-cell${cls}" data-index="${imgIdx++}">
       <img src="${url}" alt="Mt. Mitchell" loading="lazy" onload="this.classList.add('loaded')">
     </div>`;
-      }
-    });
-
-    const code = `  <!-- ═ GALLERY GRID ═ -->\n  <div class="gallery-grid" id="gallery-grid">\n\n${lines.join('\n\n')}\n\n  </div>`;
-
-    document.getElementById('output-section').style.display = 'block';
-    document.getElementById('output-code').textContent = code;
-    document.getElementById('output-section').scrollIntoView({ behavior: 'smooth' });
-    setStatus(`Code generated for ${galleryItems.length} items. Copy and paste into mitchell.html.`);
-  }
-
-  function copyCode() {
-    const code = document.getElementById('output-code').textContent;
-    navigator.clipboard.writeText(code).then(() => {
-      setStatus('Copied to clipboard.');
-    });
-  }
-
-  function setStatus(msg) {
-    const s = document.getElementById('status');
-    // Keep any child inputs/buttons, just update first text node
-    const span = s.querySelector('span') || s;
-    if (s.querySelector('span')) {
-      s.querySelector('span').textContent = msg;
-    } else {
-      s.textContent = msg;
-    }
-  }
-
-  // Pre-baked file list
-  const BAKED_FILES = [
-    '0C9AFE49-0345-49C3-9173-95DDBF9738542022-10-23_11-37-12_729.jpeg',
-    '4C072CB8-39B8-4FF6-B494-864AFEE7FF6F2022-10-23_11-44-57_175.jpeg',
-    '7FD9E045-93B6-4371-9BBA-846871CAE3F328899061161_48ac818451_o.jpg',
-    '23FD5665-62AA-47E9-B3E9-F5098B73FCA328899618141_9e7e0cba11_o.jpg',
-    '72D72FE9-3AC4C89-A57B-464026DA49A5346882640344_66e49b0bd0_o.jpg',
-    '122DE275-6732-4D8B-879C-9CE709A99A022022-10-23_10-48-28_459.jpeg',
-    '620D121A-01DA-4435-B680-AE1A7B2F7F3828871027652_763858f2b8_o.jpg',
-    '779BC693-781B-4BCA-908F-70CC718C95BA35362341852_b6b3bf464f_o_34784192153_o.jpg',
-    '874DF94F-1DB3-402E-8653-2F8D9B38706735397109591_760228cabd_o.jpg',
-    '2242F918-E53E-458C-BC71-F4C81296EE6128870960302_bc103e0d44_o.jpg',
-    '40561E70-5212-4819-9A5F-E03C592ED14F2022-10-23_10-47-28_072.jpeg',
-    '28359307213_b55fe8035f_o.jpg',
-    '28870907852_6835441bb7_o.jpg',
-    '28943522256_fb4d140ea1_o.jpg',
-    '28975382015_fa3646cde1_o.jpg',
-    '28975382975_864de72aeb_o.jpg',
-    '30513965882_d55f167052_o.JPG',
-    '30594969976_8c7766ccff_o.JPG',
-    '35527968665_2af45f4333_o.JPG',
-    'A974B932-B8D6-4264-8533-31142CBA692234688258714_92ba343e67_o.jpg',
-    'A2909AEA-82B5-4722-8BC3-8ED2B954495528870877912_59d01f74e3_o.jpg',
-    'C44BF404-5A97-4F0E-9385-4ACF6D7F672628943548526_8e5b27aefa_o.jpg',
-    'E533D178-9E53-4728-AB0C-9EDCBF5691FE28690058330_727c4373b1_o.jpg',
-    'F4E5EB42-5476-44F2-BB54-6800E174A7FA35398926091_fc2bf18c8d_o.jpg',
-    'F830606B-DCF5-4C4C-8FC4-18BC7731107B28690003400_e39d4cf46a_o.jpg',
-    'IMG_1016.JPG','IMG_1041.JPG','IMG_2148.jpeg','IMG_5175.JPG',
-    'IMG_6197.jpeg','IMG_6259.jpeg','IMG_6360.jpeg','IMG_6867.JPG',
-    'IMG_6899.JPG','IMG_6922.JPG','IMG_6926.JPG','IMG_6939.JPG',
-    'IMG_6961.JPG','IMG_6968.JPG','IMG_6982.JPG','IMG_7002.JPG',
-    'IMG_7029.jpg','IMG_7087.JPG','IMG_7133.JPG','IMG_7310.JPG',
-    'IMG_7322.JPG','IMG_7329.JPG','IMG_7548.JPG','IMG_7680.JPG',
-    'IMG_7681.JPG','IMG_7713.JPG','IMG_7716.JPG','IMG_7728.JPG',
-    'IMG_7734.JPG','IMG_7745.JPG','IMG_7753.JPG','IMG_9408.JPG',
-    'IMG_9742.JPG','PXL_20240915_134927818_Original.jpg'
-  ];
-
-  window.addEventListener('load', () => {
-    allFiles = BAKED_FILES;
-    renderPool();
-    setStatus(`${allFiles.length} files loaded. Drag into the gallery below, or double-click to add.`);
   });
+  const code = `<div class="gallery-grid" id="gallery-grid">\n\n${lines.join('\n\n')}\n\n</div>`;
+  document.getElementById('output-section').style.display = 'block';
+  document.getElementById('output-code').textContent = code;
+  document.getElementById('output-section').scrollIntoView({ behavior: 'smooth' });
+  setStatus(`Code generated for ${gallery.length} items.`);
+}
+
+function copyCode() {
+  const code = document.getElementById('output-code').textContent;
+  if (!code) { alert('Generate code first.'); return; }
+  navigator.clipboard.writeText(code).then(() => setStatus('Copied to clipboard.'));
+}
+
+renderPool();
+renderGallery();
+setStatus(`${gallery.length} files loaded · Click to select · Shift+click for range · Drag to reorder`);
 </script>
 </body>
 </html>
