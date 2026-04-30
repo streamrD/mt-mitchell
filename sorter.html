@@ -275,6 +275,98 @@
     white-space: pre-wrap; word-break: break-all;
     max-height: 400px; overflow-y: auto;
   }
+
+  /* Preview modal */
+  #preview-modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+    background: #f2efeb;
+    overflow-y: auto;
+  }
+  #preview-modal.open { display: block; }
+
+  .preview-bar {
+    position: sticky;
+    top: 0;
+    z-index: 201;
+    background: #2a3540;
+    color: rgba(210,228,236,0.7);
+    padding: 0.75rem 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+  .preview-bar strong { color: rgba(210,228,236,0.9); font-weight: 400; }
+
+  .preview-gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2px;
+  }
+  .preview-cell {
+    position: relative;
+    aspect-ratio: 1;
+    overflow: hidden;
+    background: #2a3540;
+    cursor: pointer;
+  }
+  .preview-cell.wide  { grid-column: span 2; aspect-ratio: 2/1; }
+  .preview-cell.full  { grid-column: span 3; aspect-ratio: 3/1; }
+  .preview-cell.tall  { grid-row: span 2; aspect-ratio: 1/2; }
+  .preview-cell.featured { grid-column: span 2; grid-row: span 2; aspect-ratio: 1; }
+  .preview-cell.video-cell { grid-column: 1 / -1; aspect-ratio: 16/9; }
+
+  .preview-cell img {
+    width: 100%; height: 100%;
+    object-fit: cover; display: block;
+    transition: opacity 0.4s ease, transform 0.5s ease;
+    opacity: 0;
+  }
+  .preview-cell img.loaded { opacity: 1; }
+  .preview-cell:hover img { transform: scale(1.03); }
+
+  .preview-cell .video-overlay {
+    position: absolute; inset: 0;
+    background: linear-gradient(to top, rgba(20,28,34,0.75) 0%, rgba(20,28,34,0.1) 60%);
+    display: flex; align-items: flex-end; justify-content: space-between;
+    padding: 1.5rem 2rem; pointer-events: none;
+  }
+  .preview-cell .video-meta { flex: 1; }
+  .preview-cell .video-title-label {
+    font-family: Georgia, serif;
+    font-style: italic; font-weight: 300;
+    font-size: clamp(1rem, 2vw, 1.4rem);
+    color: rgba(235,245,250,0.95);
+    line-height: 1.2; margin-bottom: 0.25rem;
+  }
+  .preview-cell .video-date-label {
+    font-size: 11px; font-weight: 200;
+    letter-spacing: 0.18em; text-transform: uppercase;
+    color: rgba(180,205,215,0.6);
+  }
+  .preview-cell .play-indicator svg { width: 48px; height: 48px; opacity: 0.7; }
+
+  /* Lightbox inside preview */
+  #preview-lb {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 300;
+    background: rgba(14,20,24,0.97);
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+  }
+  #preview-lb.open { display: flex; }
+  #preview-lb img { max-width: 92vw; max-height: 90vh; object-fit: contain; cursor: default; }
+  #preview-lb iframe { width: 80vw; height: 45vw; min-height: 320px; border: none; cursor: default; }
+  .lb-ui { position: fixed; font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; cursor: pointer; padding: 1rem; color: rgba(200,218,226,0.45); transition: color 0.2s; }
+  .lb-ui:hover { color: rgba(200,218,226,0.9); }
 </style>
 </head>
 <body>
@@ -284,7 +376,10 @@
     <h1>Gallery Sorter — 6,684 Feet</h1>
     <p>All images and videos auto-loaded · Click to select · Drag or use controls to reorder</p>
   </div>
-  <button class="warm" onclick="generateCode()">Generate code ↗</button>
+  <div style="display:flex; gap:0.5rem;">
+    <button class="secondary" onclick="openPreview()">Preview gallery ↗</button>
+    <button class="warm" onclick="generateCode()">Generate code ↗</button>
+  </div>
 </header>
 
 <div class="top-bar">
@@ -683,5 +778,145 @@ renderPool();
 renderGallery();
 setStatus(`${gallery.length} items loaded · Click to select · Shift+click for range · Drag to reorder`);
 </script>
+<!-- Preview Modal -->
+<div id="preview-modal">
+  <div class="preview-bar">
+    <strong>Gallery Preview</strong>
+    <span style="opacity:0.5;">Click any photo to see full size · Escape or button to return</span>
+    <button class="secondary sm" onclick="closePreview()" style="margin-left:2rem;">← Back to sorter</button>
+  </div>
+  <div class="preview-gallery-grid" id="preview-grid"></div>
+</div>
+
+<!-- Preview Lightbox -->
+<div id="preview-lb">
+  <span class="lb-ui" style="top:1.5rem; right:2rem;" onclick="closePLb()">Close</span>
+  <span class="lb-ui" id="plb-prev" style="top:50%; left:1.5rem; transform:translateY(-50%);">←</span>
+  <span class="lb-ui" id="plb-next" style="top:50%; right:1.5rem; transform:translateY(-50%);">→</span>
+</div>
+
+<script>
+  // ── Preview ──
+  let previewItems = [];
+  let plbIdx = 0;
+  const plb = document.getElementById('preview-lb');
+
+  function openPreview() {
+    const grid = document.getElementById('preview-grid');
+    grid.innerHTML = '';
+    previewItems = [];
+
+    gallery.forEach((item, i) => {
+      const cell = document.createElement('div');
+
+      if (item.type === 'video') {
+        cell.className = 'preview-cell video-cell';
+        const img = document.createElement('img');
+        img.src = `https://img.youtube.com/vi/${item.youtubeId}/maxresdefault.jpg`;
+        img.loading = 'lazy';
+        img.onload = () => img.classList.add('loaded');
+        cell.appendChild(img);
+
+        const overlay = document.createElement('div');
+        overlay.className = 'video-overlay';
+        overlay.innerHTML = `
+          <div class="video-meta">
+            <p class="video-title-label">${item.title}</p>
+            <p class="video-date-label">${item.date}</p>
+          </div>
+          <div class="play-indicator">
+            <svg viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="22" cy="22" r="21" stroke="white" stroke-width="1"/>
+              <polygon points="18,14 32,22 18,30" fill="white"/>
+            </svg>
+          </div>`;
+        cell.appendChild(overlay);
+
+        cell.addEventListener('click', () => {
+          plb.querySelector('img, iframe')?.remove();
+          const iframe = document.createElement('iframe');
+          iframe.src = `https://www.youtube.com/embed/${item.youtubeId}?autoplay=1&rel=0&modestbranding=1`;
+          iframe.allow = 'autoplay; encrypted-media';
+          iframe.allowFullscreen = true;
+          plb.appendChild(iframe);
+          plb.classList.add('open');
+        });
+
+      } else {
+        const cls = item.override ? ` ${item.override}` : '';
+        cell.className = `preview-cell${cls}`;
+        const url = BASE + encodeURIComponent(item.filename);
+        const img = document.createElement('img');
+        img.src = url;
+        img.loading = 'lazy';
+        img.onload = () => img.classList.add('loaded');
+        cell.appendChild(img);
+
+        const pIdx = previewItems.length;
+        previewItems.push({ src: url, alt: item.filename });
+
+        cell.addEventListener('click', () => openPLb(pIdx));
+      }
+
+      grid.appendChild(cell);
+    });
+
+    document.getElementById('preview-modal').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closePreview() {
+    document.getElementById('preview-modal').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  function openPLb(idx) {
+    plbIdx = idx;
+    renderPLb();
+    plb.classList.add('open');
+  }
+
+  function closePLb() {
+    plb.classList.remove('open');
+    plb.querySelector('img, iframe')?.remove();
+  }
+
+  function renderPLb() {
+    plb.querySelector('img, iframe')?.remove();
+    const item = previewItems[plbIdx];
+    if (!item) return;
+    const img = document.createElement('img');
+    img.src = item.src;
+    img.alt = item.alt;
+    plb.appendChild(img);
+  }
+
+  document.getElementById('plb-prev').addEventListener('click', e => {
+    e.stopPropagation();
+    plbIdx = (plbIdx - 1 + previewItems.length) % previewItems.length;
+    renderPLb();
+  });
+
+  document.getElementById('plb-next').addEventListener('click', e => {
+    e.stopPropagation();
+    plbIdx = (plbIdx + 1) % previewItems.length;
+    renderPLb();
+  });
+
+  plb.addEventListener('click', e => { if (e.target === plb) closePLb(); });
+
+  document.addEventListener('keydown', e => {
+    if (plb.classList.contains('open')) {
+      if (e.key === 'Escape') closePLb();
+      if (e.key === 'ArrowLeft') { plbIdx = (plbIdx - 1 + previewItems.length) % previewItems.length; renderPLb(); }
+      if (e.key === 'ArrowRight') { plbIdx = (plbIdx + 1) % previewItems.length; renderPLb(); }
+      return;
+    }
+    if (document.getElementById('preview-modal').classList.contains('open')) {
+      if (e.key === 'Escape') closePreview();
+    }
+  });
+</script>
+
 </body>
 </html>
