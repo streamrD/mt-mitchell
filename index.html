@@ -7,8 +7,11 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Spectral:ital,wght@0,300;0,400;1,300;1,400&family=Overpass:wght@200;300;400&display=swap" rel="stylesheet">
+
 <style>
+  /* ── Reset & Base ── */
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
   :root {
     --haze-dark:    #2a3540;
     --haze-mid:     #7a9aaa;
@@ -31,7 +34,9 @@
     --col-width:    640px;
     --gap:          2px;
   }
+
   html { scroll-behavior: smooth; }
+
   body {
     background: var(--page-bg);
     color: var(--ink);
@@ -41,6 +46,8 @@
     font-size: 18px;
     -webkit-font-smoothing: antialiased;
   }
+
+  /* ── Landing ── */
   #landing {
     position: relative;
     width: 100%;
@@ -51,6 +58,7 @@
     align-items: flex-end;
     background: var(--haze-dark);
   }
+
   #landing-img {
     position: absolute;
     inset: 0;
@@ -61,23 +69,40 @@
     opacity: 0;
     transition: opacity 1.8s ease;
   }
+
   #landing-img.loaded { opacity: 1; }
+
   .landing-placeholder {
     position: absolute;
     inset: 0;
-    background: linear-gradient(160deg, #2a3d4a 0%, #3a5060 30%, #7a9aaa 60%, #b0c8d4 80%, #dde6ea 100%);
+    background: linear-gradient(
+      160deg,
+      #2a3d4a 0%,
+      #3a5060 30%,
+      #7a9aaa 60%,
+      #b0c8d4 80%,
+      #dde6ea 100%
+    );
   }
+
   .landing-overlay {
     position: absolute;
     inset: 0;
-    background: linear-gradient(to top, rgba(20,28,34,0.85) 0%, rgba(20,28,34,0.3) 50%, rgba(20,28,34,0.1) 100%);
+    background: linear-gradient(
+      to top,
+      rgba(20,28,34,0.85) 0%,
+      rgba(20,28,34,0.3) 50%,
+      rgba(20,28,34,0.1) 100%
+    );
   }
+
   .landing-text {
     position: relative;
     z-index: 2;
     padding: 0 6vw 8vh;
     max-width: 900px;
   }
+
   .landing-eyebrow {
     font-family: var(--font-sans);
     font-weight: 200;
@@ -87,6 +112,7 @@
     color: rgba(220,232,238,0.65);
     margin-bottom: 1rem;
   }
+
   .landing-title {
     font-family: var(--font-display);
     font-weight: 300;
@@ -95,7 +121,12 @@
     color: #f0f4f6;
     letter-spacing: -0.01em;
   }
-  .landing-title em { font-style: italic; color: rgba(192,128,64,0.9); }
+
+  .landing-title em {
+    font-style: italic;
+    color: rgba(192,128,64,0.9);
+  }
+
   .landing-subtitle {
     font-family: var(--font-display);
     font-style: italic;
@@ -105,6 +136,7 @@
     margin-top: 0.75rem;
     letter-spacing: 0.02em;
   }
+
   .landing-meta {
     font-family: var(--font-sans);
     font-weight: 200;
@@ -114,6 +146,7 @@
     color: rgba(160,188,200,0.55);
     margin-top: 2rem;
   }
+
   .scroll-hint {
     position: absolute;
     bottom: 2.5rem;
@@ -131,6 +164,7 @@
     color: rgba(160,188,200,0.45);
     animation: fadeInUp 2s ease 1.5s both;
   }
+
   .scroll-hint::after {
     content: '';
     display: block;
@@ -139,10 +173,28 @@
     background: rgba(160,188,200,0.3);
     animation: scrollLine 2s ease-in-out infinite;
   }
-  @keyframes scrollLine { 0%, 100% { transform: scaleY(1); opacity: 0.3; } 50% { transform: scaleY(0.4); opacity: 0.6; } }
-  @keyframes fadeInUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
-  .section { padding: 7rem 6vw; }
-  .section-inner { max-width: var(--col-width); margin: 0 auto; }
+
+  @keyframes scrollLine {
+    0%, 100% { transform: scaleY(1); opacity: 0.3; }
+    50% { transform: scaleY(0.4); opacity: 0.6; }
+  }
+
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── Section wrapper ── */
+  .section {
+    padding: 7rem 6vw;
+  }
+
+  .section-inner {
+    max-width: var(--col-width);
+    margin: 0 auto;
+  }
+
+  /* ── Year markers ── */
   .year-marker {
     font-family: var(--font-sans);
     font-weight: 200;
@@ -155,21 +207,69 @@
     align-items: center;
     gap: 1.5rem;
   }
-  .year-marker::after { content: ''; flex: 1; height: 0.5px; background: var(--rule); }
-  .essay-body p { margin-bottom: 1.6em; font-size: 1.05rem; line-height: 1.85; color: var(--ink); font-weight: 300; }
+
+  .year-marker::after {
+    content: '';
+    flex: 1;
+    height: 0.5px;
+    background: var(--rule);
+  }
+
+  /* ── Essay typography ── */
+  .essay-title {
+    font-family: var(--font-display);
+    font-weight: 300;
+    font-size: clamp(1.8rem, 4vw, 2.8rem);
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+    color: var(--ink);
+    margin-bottom: 2.5rem;
+  }
+
+  .essay-title em { font-style: italic; }
+
+  .essay-body p {
+    margin-bottom: 1.6em;
+    font-size: 1.05rem;
+    line-height: 1.85;
+    color: var(--ink);
+    font-weight: 300;
+  }
+
   .essay-body p:last-child { margin-bottom: 0; }
+
+  /* Pull quote / key lines */
   .pull {
     font-family: var(--font-display);
     font-style: italic;
-    font-size: clamp(1.15rem, 2.5vw, 1.45rem);
-    line-height: 1.55;
+    font-size: clamp(1.3rem, 3vw, 1.75rem);
+    line-height: 1.4;
     color: var(--haze-mid);
     border-left: 1.5px solid var(--haze-mid);
-    padding: 0.75rem 0 0.75rem 1.75rem;
+    padding: 0.5rem 0 0.5rem 1.75rem;
     margin: 2.5rem 0;
-    display: block;
   }
-  .we-emphasis { font-style: italic; letter-spacing: 0.04em; }
+
+  /* The "we" emphasis */
+  .we-emphasis {
+    font-style: italic;
+    letter-spacing: 0.04em;
+  }
+
+  /* Closing line */
+  .closing-line {
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: 1rem;
+    color: var(--ink-light);
+    margin-top: 3rem;
+    padding-top: 2rem;
+    border-top: 0.5px solid var(--rule);
+    text-align: right;
+    letter-spacing: 0.03em;
+  }
+
+  /* ── Divider between essay and gallery ── */
   .elevation-divider {
     text-align: center;
     padding: 4rem 6vw;
@@ -180,7 +280,9 @@
     text-transform: uppercase;
     color: var(--ink-light);
   }
-  .elevation-divider::before, .elevation-divider::after {
+
+  .elevation-divider::before,
+  .elevation-divider::after {
     content: '';
     display: inline-block;
     width: 60px;
@@ -189,7 +291,12 @@
     vertical-align: middle;
     margin: 0 1.5rem;
   }
-  #gallery { padding: 0 0 6rem; background: var(--page-bg); }
+
+  /* ── Gallery ── */
+  #gallery {
+    padding: 0 0 6rem;
+  }
+
   .gallery-section-label {
     font-family: var(--font-sans);
     font-weight: 200;
@@ -199,12 +306,14 @@
     color: var(--ink-light);
     padding: 3rem 6vw 1.5rem;
   }
+
   .gallery-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: var(--gap);
     padding: 0;
   }
+
   .gallery-cell {
     position: relative;
     aspect-ratio: 1;
@@ -212,68 +321,87 @@
     background: var(--haze-dark);
     cursor: pointer;
   }
-  .gallery-cell.wide { grid-column: span 2; aspect-ratio: 2/1; }
-  .gallery-cell.full { grid-column: span 3; aspect-ratio: 3/1; }
-  .gallery-cell.tall { grid-row: span 2; aspect-ratio: 1/2; }
-  .gallery-cell.featured { grid-column: span 2; grid-row: span 2; aspect-ratio: 1; }
+
+  .gallery-cell.wide {
+    grid-column: span 2;
+    aspect-ratio: 2 / 1;
+  }
+
+  .gallery-cell.full {
+    grid-column: span 3;
+    aspect-ratio: 3 / 1;
+  }
+
+  .gallery-cell.tall {
+    grid-row: span 2;
+    aspect-ratio: 1 / 2;
+  }
+
+  .gallery-cell.featured {
+    grid-column: span 2;
+    grid-row: span 2;
+    aspect-ratio: 1;
+  }
+
   .gallery-cell img {
-    width: 100%; height: 100%;
-    object-fit: cover; display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
     transition: transform 0.6s ease, opacity 0.4s ease;
     opacity: 0;
   }
+
   .gallery-cell img.loaded { opacity: 1; }
   .gallery-cell:hover img { transform: scale(1.03); }
+
+  /* Video cells */
   .gallery-cell.video-cell {
-    grid-column: 1 / -1;
-    aspect-ratio: 16/9;
-    background: #1e2c34;
-    cursor: pointer;
+    background: var(--haze-dark);
   }
-  .gallery-cell.video-cell img {
-    width: 100%; height: 100%;
-    object-fit: cover; display: block;
-    transition: opacity 0.4s ease, transform 0.6s ease;
-    opacity: 0;
-  }
-  .gallery-cell.video-cell img.loaded { opacity: 1; }
-  .gallery-cell.video-cell:hover img { transform: scale(1.02); }
-  .video-overlay {
+
+  .gallery-cell.video-cell .play-indicator {
     position: absolute;
     inset: 0;
-    background: linear-gradient(to top, rgba(20,28,34,0.75) 0%, rgba(20,28,34,0.1) 60%);
     display: flex;
-    align-items: flex-end;
-    justify-content: space-between;
-    padding: 1.5rem 2rem;
+    align-items: center;
+    justify-content: center;
     z-index: 2;
     pointer-events: none;
-    transition: background 0.3s;
   }
-  .gallery-cell.video-cell:hover .video-overlay {
-    background: linear-gradient(to top, rgba(20,28,34,0.85) 0%, rgba(20,28,34,0.2) 60%);
+
+  .play-indicator svg {
+    width: 44px;
+    height: 44px;
+    opacity: 0.7;
+    transition: opacity 0.3s;
   }
-  .video-meta { flex: 1; }
-  .video-title-label {
-    font-family: var(--font-display);
-    font-style: italic;
-    font-size: clamp(1rem, 2vw, 1.4rem);
-    color: rgba(235,245,250,0.95);
-    font-weight: 300;
-    line-height: 1.2;
-    margin-bottom: 0.25rem;
-  }
-  .video-date-label {
+
+  .gallery-cell.video-cell:hover .play-indicator svg { opacity: 1; }
+
+  /* Placeholder cells */
+  .ph {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     font-family: var(--font-sans);
-    font-size: 11px;
-    font-weight: 200;
-    letter-spacing: 0.18em;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    color: rgba(255,255,255,0.2);
     text-transform: uppercase;
-    color: rgba(180,205,215,0.6);
   }
-  .play-indicator { display: flex; align-items: center; justify-content: center; pointer-events: none; }
-  .play-indicator svg { width: 48px; height: 48px; opacity: 0.7; transition: opacity 0.3s, transform 0.3s; }
-  .gallery-cell.video-cell:hover .play-indicator svg { opacity: 1; transform: scale(1.1); }
+
+  /* Palette-matched placeholder backgrounds */
+  .ph-haze   { background: #3a4e5a; }
+  .ph-cloud  { background: #6a8090; }
+  .ph-forest { background: #2e4038; }
+  .ph-warm   { background: #6a4e2a; }
+  .ph-dead   { background: #5a6460; }
+  .ph-fog    { background: #4a5860; }
+
+  /* ── Lightbox ── */
   #lightbox {
     display: none;
     position: fixed;
@@ -284,38 +412,124 @@
     justify-content: center;
     cursor: pointer;
   }
+
   #lightbox.open { display: flex; }
-  #lightbox img, #lightbox iframe { max-width: 92vw; max-height: 88vh; object-fit: contain; cursor: default; border: none; }
-  #lightbox iframe { width: 80vw; height: 45vw; min-height: 320px; }
+
+  #lightbox img, #lightbox iframe {
+    max-width: 92vw;
+    max-height: 88vh;
+    object-fit: contain;
+    cursor: default;
+    border: none;
+  }
+
+  #lightbox iframe {
+    width: 80vw;
+    height: 45vw;
+    min-height: 320px;
+  }
+
   .lb-close {
-    position: fixed; top: 1.5rem; right: 2rem;
-    font-family: var(--font-sans); font-weight: 200; font-size: 11px;
-    letter-spacing: 0.2em; text-transform: uppercase;
-    color: rgba(200,218,226,0.5); cursor: pointer; transition: color 0.2s;
+    position: fixed;
+    top: 1.5rem;
+    right: 2rem;
+    font-family: var(--font-sans);
+    font-weight: 200;
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: rgba(200,218,226,0.5);
+    cursor: pointer;
+    transition: color 0.2s;
   }
+
   .lb-close:hover { color: rgba(200,218,226,0.9); }
+
   .lb-nav {
-    position: fixed; top: 50%; transform: translateY(-50%);
-    font-family: var(--font-sans); font-weight: 200; font-size: 11px;
-    letter-spacing: 0.2em; color: rgba(200,218,226,0.4);
-    cursor: pointer; padding: 1rem; transition: color 0.2s; user-select: none;
+    position: fixed;
+    top: 50%;
+    transform: translateY(-50%);
+    font-family: var(--font-sans);
+    font-weight: 200;
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    color: rgba(200,218,226,0.4);
+    cursor: pointer;
+    padding: 1rem;
+    transition: color 0.2s;
+    user-select: none;
   }
+
   .lb-nav:hover { color: rgba(200,218,226,0.9); }
   #lb-prev { left: 1.5rem; }
   #lb-next { right: 1.5rem; }
-  .interlude { padding: 5rem 6vw; display: flex; align-items: center; justify-content: center; }
-  .interlude-inner { display: flex; flex-direction: column; align-items: center; gap: 1rem; }
-  .interlude-dots { display: flex; gap: 6px; }
-  .interlude-dots span { width: 3px; height: 3px; border-radius: 50%; background: var(--ink-light); opacity: 0.4; }
-  .interlude-label {
-    font-family: var(--font-sans); font-weight: 200; font-size: 10px;
-    letter-spacing: 0.3em; text-transform: uppercase; color: var(--ink-light); opacity: 0.6;
+
+  /* ── Section between essays ── */
+  .interlude {
+    padding: 5rem 6vw;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
-  #essay-2016 { background: var(--page-bg-warm); }
-  #essay-2016 .essay-body p { color: #2a2018; }
-  #essay-2016 .year-marker { color: #9a7a50; }
-  #essay-2016 .year-marker::after { background: rgba(154,122,80,0.2); }
-  #essay-2016 .pull { color: #9a7a50; border-left-color: #9a7a50; }
+
+  .interlude-inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .interlude-dots {
+    display: flex;
+    gap: 6px;
+  }
+
+  .interlude-dots span {
+    width: 3px;
+    height: 3px;
+    border-radius: 50%;
+    background: var(--ink-light);
+    opacity: 0.4;
+  }
+
+  .interlude-label {
+    font-family: var(--font-sans);
+    font-weight: 200;
+    font-size: 10px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--ink-light);
+    opacity: 0.6;
+  }
+
+  /* ── Second essay — warm shift ── */
+  #essay-2016 {
+    background: var(--page-bg-warm);
+  }
+
+  #essay-2016 .essay-body p {
+    color: #2a2018;
+  }
+
+  #essay-2016 .year-marker {
+    color: #9a7a50;
+  }
+
+  #essay-2016 .year-marker::after {
+    background: rgba(154,122,80,0.2);
+  }
+
+  #essay-2016 .pull {
+    color: #9a7a50;
+    border-left-color: #9a7a50;
+  }
+
+  #essay-2016 .closing-line {
+    color: #9a7a50;
+    border-top-color: rgba(154,122,80,0.2);
+  }
+
+  /* ── Footer ── */
   footer {
     background: var(--haze-dark);
     color: rgba(180,200,210,0.5);
@@ -326,16 +540,38 @@
     flex-wrap: wrap;
     gap: 1rem;
   }
-  .footer-meta {
-    font-family: var(--font-sans); font-weight: 200; font-size: 10px;
-    letter-spacing: 0.2em; text-transform: uppercase; text-align: right; line-height: 2;
-  }
+
   .footer-title {
-    font-family: var(--font-display); font-style: italic; font-weight: 300;
-    font-size: 1rem; color: rgba(200,220,228,0.6);
+    font-family: var(--font-display);
+    font-style: italic;
+    font-weight: 300;
+    font-size: 1rem;
+    color: rgba(200,220,228,0.6);
   }
-  .reveal { opacity: 0; transform: translateY(20px); transition: opacity 0.9s ease, transform 0.9s ease; }
-  .reveal.visible { opacity: 1; transform: translateY(0); }
+
+  .footer-meta {
+    font-family: var(--font-sans);
+    font-weight: 200;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    text-align: right;
+    line-height: 2;
+  }
+
+  /* ── Fade-in on scroll ── */
+  .reveal {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.9s ease, transform 0.9s ease;
+  }
+
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* ── Responsive ── */
   @media (max-width: 768px) {
     .gallery-grid { grid-template-columns: repeat(2, 1fr); }
     .gallery-cell.full { grid-column: span 2; aspect-ratio: 2/1; }
@@ -345,18 +581,22 @@
     footer { flex-direction: column; text-align: center; }
     .footer-meta { text-align: center; }
   }
+
   @media (max-width: 480px) {
     .gallery-grid { grid-template-columns: 1fr; }
-    .gallery-cell.wide, .gallery-cell.full, .gallery-cell.featured { grid-column: span 1; aspect-ratio: 1; }
+    .gallery-cell.wide,
+    .gallery-cell.full,
+    .gallery-cell.featured { grid-column: span 1; aspect-ratio: 1; }
   }
 </style>
 </head>
 <body>
 
-<!-- LANDING -->
+<!-- ══ LANDING ══ -->
 <section id="landing">
   <div class="landing-placeholder"></div>
-  <img id="landing-img" src="https://s3.us-east-005.backblazeb2.com/mtmitchell/panorama-2.jpg" alt="Mt. Mitchell cloud sea panorama" onload="this.classList.add('loaded')">
+  <!-- Replace src with your Backblaze panorama URL -->
+  <img id="landing-img" src="YOUR_PANORAMA_URL_HERE" alt="Mt. Mitchell cloud sea panorama" onload="this.classList.add('loaded')">
   <div class="landing-overlay"></div>
   <div class="landing-text">
     <p class="landing-eyebrow">Mt. Mitchell · Black Mountains · North Carolina</p>
@@ -367,16 +607,16 @@
   <div class="scroll-hint">Scroll</div>
 </section>
 
-<!-- ESSAY 2026 -->
+<!-- ══ ESSAY 2026 ══ -->
 <section class="section" id="essay-2026">
   <div class="section-inner">
-    <div class="year-marker reveal">April, 2026</div>
+    <div class="year-marker reveal">2026</div>
     <div class="essay-body reveal">
       <p>This is my fourth time hiking on Mt. Mitchell this month. I hadn't been up here since 2024, just before Helene. I need this place right now. I come to these mountains to see again.</p>
       <p>Driving up the Blue Ridge Parkway, even now you see trees leaning against each other like matchsticks, swaths of hillsides stripped bare by mudslides, evidence of a hurricane where a hurricane should not be. The spruce-fir ecosystem of the Southern Appalachians is more fragile than it appears, clinging to these peaks like a relic of the last Ice Age. It exists nowhere else at this latitude. It does not recover quickly. What a storm removes in a night may take a century to return.</p>
       <p>And yet, stand still long enough and you feel permanence beneath the fragility. These Black Mountains are among the oldest on earth, worn down over hundreds of millions of years by nothing more than water, time, and wind. A drop, a rivulet, repeated again and again, multiplied by numbers too large for a human mind to hold. Helene was catastrophic by any human measure. On the scale by which these mountains keep time, it was barely a tremor.</p>
       <p>When you walk into these spruce-fir forests, the smell of Christmas fills your nose — elevated above any nostalgia — resinous, bracing, clean. Then you notice the sound — more accurately, the absence of it. Today as I entered I tried to locate something I was hearing, but realized it was my own blood rushing in my head. The silence presses in on you from all sides. Even the birds are different here. They converse with this silence, ask it questions, listen.</p>
-      <pull class="pull">This is what a cathedral wants to be. The only proper word for it is holy.</pull>
+      <pull class="pull">"This is what a cathedral wants to be. The only proper word for it is holy."</pull>
       <p>At some point the wind will announce itself. When it lifts and moves through this canopy, it invokes vastness, openness, distance in a low, continuous surge that arrives from everywhere at once and cannot be localized. The sound of an ocean, but overhead as well as below.</p>
       <p>I've walked these paths at the height of summer's groggy heat, the air thick and close even at this elevation. I've seen the transformation a sudden rain brings — moss soaked through, the rocky trail now a stream — wet shoes, wet clothes — the whole forest snapping back to life. I spent a night on a high, exposed ridge here in a torrential storm, thunder crashing all around, the wind roaring, collapsing my tent on top of me over and over all night long so I wasn't sure I'd be hiking out in the morning. Mitchell is not one place. It is many places occupying the same coordinates. I've learned to come here without expectations and let it show me what I need.</p>
       <p>What it gave me today is clouds.</p>
@@ -388,179 +628,196 @@
   </div>
 </section>
 
-<!-- DIVIDER -->
+<!-- ══ DIVIDER ══ -->
 <div class="elevation-divider reveal">
   Mt. Mitchell · 6,684 ft · Highest peak east of the Mississippi
 </div>
 
-<!-- GALLERY -->
+<!-- ══ GALLERY ══ -->
 <section id="gallery">
-  <p class="gallery-section-label reveal">Photographs and Video · 2016–2026</p>
+  <p class="gallery-section-label reveal">Photographs · 2016–2026</p>
+
   <div class="gallery-grid" id="gallery-grid">
 
-    <!-- The Clouds · April, 2026 -->
-    <div class="gallery-cell video-cell" data-type="video" data-video-id="nk68MfdAjwA">
-      <img src="https://s3.us-east-005.backblazeb2.com/mtmitchell/clouds-thumb.jpg" alt="The Clouds" loading="lazy" onload="this.classList.add('loaded')">
-      <div class="video-overlay">
-        <div class="video-meta">
-          <p class="video-title-label">The Clouds</p>
-          <p class="video-date-label">April, 2026</p>
-        </div>
-        <div class="play-indicator">
-          <svg viewBox="0 0 44 44" fill="none"><circle cx="22" cy="22" r="21" stroke="white" stroke-width="1"/><polygon points="18,14 32,22 18,30" fill="white"/></svg>
-        </div>
+    <!-- ─ Row 1 ─ -->
+    <!-- FULL-WIDTH panorama — replace src -->
+    <div class="gallery-cell full" data-index="0">
+      <div class="ph ph-cloud">Panorama</div>
+    </div>
+
+    <!-- ─ Row 2 ─ -->
+    <div class="gallery-cell" data-index="1"><div class="ph ph-haze">Photo</div></div>
+    <div class="gallery-cell wide" data-index="2"><div class="ph ph-cloud">Wide</div></div>
+
+    <!-- ─ Row 3 ─ -->
+    <div class="gallery-cell" data-index="3"><div class="ph ph-forest">Photo</div></div>
+    <div class="gallery-cell" data-index="4"><div class="ph ph-dead">Photo</div></div>
+    <div class="gallery-cell" data-index="5"><div class="ph ph-haze">Photo</div></div>
+
+    <!-- ─ Row 4: video break ─ -->
+    <div class="gallery-cell video-cell wide" data-type="video" data-video-id="YOUR_YOUTUBE_ID_1">
+      <div class="ph ph-haze">Video</div>
+      <div class="play-indicator">
+        <svg viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="22" cy="22" r="21" stroke="white" stroke-width="1"/>
+          <polygon points="18,14 32,22 18,30" fill="white"/>
+        </svg>
+      </div>
+    </div>
+    <div class="gallery-cell" data-index="6"><div class="ph ph-warm">Photo</div></div>
+
+    <!-- ─ Rows 5–9: standard photos ─ -->
+    <div class="gallery-cell" data-index="7"><div class="ph ph-forest">Photo</div></div>
+    <div class="gallery-cell" data-index="8"><div class="ph ph-dead">Photo</div></div>
+    <div class="gallery-cell" data-index="9"><div class="ph ph-fog">Photo</div></div>
+
+    <div class="gallery-cell" data-index="10"><div class="ph ph-haze">Photo</div></div>
+    <div class="gallery-cell" data-index="11"><div class="ph ph-cloud">Photo</div></div>
+    <div class="gallery-cell" data-index="12"><div class="ph ph-forest">Photo</div></div>
+
+    <!-- ─ Second video ─ -->
+    <div class="gallery-cell video-cell" data-type="video" data-video-id="YOUR_YOUTUBE_ID_2">
+      <div class="ph ph-fog">Video</div>
+      <div class="play-indicator">
+        <svg viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="22" cy="22" r="21" stroke="white" stroke-width="1"/>
+          <polygon points="18,14 32,22 18,30" fill="white"/>
+        </svg>
+      </div>
+    </div>
+    <div class="gallery-cell" data-index="13"><div class="ph ph-warm">Photo</div></div>
+    <div class="gallery-cell" data-index="14"><div class="ph ph-dead">Photo</div></div>
+
+    <div class="gallery-cell" data-index="15"><div class="ph ph-haze">Photo</div></div>
+    <div class="gallery-cell" data-index="16"><div class="ph ph-forest">Photo</div></div>
+    <div class="gallery-cell" data-index="17"><div class="ph ph-cloud">Photo</div></div>
+
+    <div class="gallery-cell" data-index="18"><div class="ph ph-dead">Photo</div></div>
+    <div class="gallery-cell" data-index="19"><div class="ph ph-fog">Photo</div></div>
+    <div class="gallery-cell" data-index="20"><div class="ph ph-haze">Photo</div></div>
+
+    <!-- ─ Featured cell ─ -->
+    <div class="gallery-cell featured" data-index="21"><div class="ph ph-warm">Featured</div></div>
+    <div class="gallery-cell" data-index="22"><div class="ph ph-forest">Photo</div></div>
+    <div class="gallery-cell" data-index="23"><div class="ph ph-dead">Photo</div></div>
+
+    <!-- ─ More photos + videos ─ -->
+    <div class="gallery-cell" data-index="24"><div class="ph ph-cloud">Photo</div></div>
+    <div class="gallery-cell" data-index="25"><div class="ph ph-haze">Photo</div></div>
+    <div class="gallery-cell video-cell" data-type="video" data-video-id="YOUR_YOUTUBE_ID_3">
+      <div class="ph ph-forest">Video</div>
+      <div class="play-indicator">
+        <svg viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="22" cy="22" r="21" stroke="white" stroke-width="1"/>
+          <polygon points="18,14 32,22 18,30" fill="white"/>
+        </svg>
       </div>
     </div>
 
-    <div class="gallery-cell wide" data-index="0"><img src="https://s3.us-east-005.backblazeb2.com/mtmitchell/IMG_7681.JPG" alt="Mt. Mitchell" loading="lazy" onload="this.classList.add('loaded')"></div>
-    <div class="gallery-cell" data-index="1"><img src="https://s3.us-east-005.backblazeb2.com/mtmitchell/IMG_6867.JPG" alt="Mt. Mitchell" loading="lazy" onload="this.classList.add('loaded')"></div>
-    <div class="gallery-cell" data-index="2"><img src="https://s3.us-east-005.backblazeb2.com/mtmitchell/IMG_7133.JPG" alt="Mt. Mitchell" loading="lazy" onload="this.classList.add('loaded')"></div>
-    <div class="gallery-cell" data-index="3"><img src="https://s3.us-east-005.backblazeb2.com/mtmitchell/IMG_7745.JPG" alt="Mt. Mitchell" loading="lazy" onload="this.classList.add('loaded')"></div>
-    <div class="gallery-cell" data-index="4"><img src="https://s3.us-east-005.backblazeb2.com/mtmitchell/IMG_7728.JPG" alt="Mt. Mitchell" loading="lazy" onload="this.classList.add('loaded')"></div>
-    <div class="gallery-cell" data-index="5"><img src="https://s3.us-east-005.backblazeb2.com/mtmitchell/IMG_7716.JPG" alt="Mt. Mitchell" loading="lazy" onload="this.classList.add('loaded')"></div>
-    <div class="gallery-cell" data-index="6"><img src="https://s3.us-east-005.backblazeb2.com/mtmitchell/IMG_7713.JPG" alt="Mt. Mitchell" loading="lazy" onload="this.classList.add('loaded')"></div>
-    <div class="gallery-cell" data-index="7"><img src="https://s3.us-east-005.backblazeb2.com/mtmitchell/IMG_7680.JPG" alt="Mt. Mitchell" loading="lazy" onload="this.classList.add('loaded')"></div>
-    <div class="gallery-cell" data-index="8"><img src="https://s3.us-east-005.backblazeb2.com/mtmitchell/IMG_7548.JPG" alt="Mt. Mitchell" loading="lazy" onload="this.classList.add('loaded')"></div>
-    <div class="gallery-cell" data-index="9"><img src="https://s3.us-east-005.backblazeb2.com/mtmitchell/IMG_7734.JPG" alt="Mt. Mitchell" loading="lazy" onload="this.classList.add('loaded')"></div>
-    <div class="gallery-cell" data-index="10"><img src="https://s3.us-east-005.backblazeb2.com/mtmitchell/IMG_7329.JPG" alt="Mt. Mitchell" loading="lazy" onload="this.classList.add('loaded')"></div>
-    <div class="gallery-cell" data-index="11"><img src="https://s3.us-east-005.backblazeb2.com/mtmitchell/IMG_7322.JPG" alt="Mt. Mitchell" loading="lazy" onload="this.classList.add('loaded')"></div>
-    <div class="gallery-cell" data-index="12"><img src="https://s3.us-east-005.backblazeb2.com/mtmitchell/IMG_7029.jpg" alt="Mt. Mitchell" loading="lazy" onload="this.classList.add('loaded')"></div>
-    <div class="gallery-cell" data-index="13"><img src="https://s3.us-east-005.backblazeb2.com/mtmitchell/IMG_7002.JPG" alt="Mt. Mitchell" loading="lazy" onload="this.classList.add('loaded')"></div>
-    <div class="gallery-cell" data-index="14"><img src="https://s3.us-east-005.backblazeb2.com/mtmitchell/IMG_7753.JPG" alt="Mt. Mitchell" loading="lazy" onload="this.classList.add('loaded')"></div>
-    <div class="gallery-cell" data-index="15"><img src="https://s3.us-east-005.backblazeb2.com/mtmitchell/IMG_6968.JPG" alt="Mt. Mitchell" loading="lazy" onload="this.classList.add('loaded')"></div>
-    <div class="gallery-cell" data-index="16"><img src="https://s3.us-east-005.backblazeb2.com/mtmitchell/IMG_6961.JPG" alt="Mt. Mitchell" loading="lazy" onload="this.classList.add('loaded')"></div>
-    <div class="gallery-cell" data-index="17"><img src="https://s3.us-east-005.backblazeb2.com/mtmitchell/IMG_6926.JPG" alt="Mt. Mitchell" loading="lazy" onload="this.classList.add('loaded')"></div>
-    <div class="gallery-cell" data-index="18"><img src="https://s3.us-east-005.backblazeb2.com/mtmitchell/IMG_6922.JPG" alt="Mt. Mitchell" loading="lazy" onload="this.classList.add('loaded')"></div>
-    <div class="gallery-cell" data-index="19"><img src="https://s3.us-east-005.backblazeb2.com/mtmitchell/IMG_6899.JPG" alt="Mt. Mitchell" loading="lazy" onload="this.classList.add('loaded')"></div>
-    <div class="gallery-cell" data-index="20"><img src="https://s3.us-east-005.backblazeb2.com/mtmitchell/PXL_20240915_134927818_Original.jpg" alt="Mt. Mitchell" loading="lazy" onload="this.classList.add('loaded')"></div>
-    <div class="gallery-cell" data-index="21"><img src="https://s3.us-east-005.backblazeb2.com/mtmitchell/IMG_6259.jpeg" alt="Mt. Mitchell" loading="lazy" onload="this.classList.add('loaded')"></div>
-    <div class="gallery-cell" data-index="22"><img src="https://s3.us-east-005.backblazeb2.com/mtmitchell/IMG_2148.jpeg" alt="Mt. Mitchell" loading="lazy" onload="this.classList.add('loaded')"></div>
+    <div class="gallery-cell" data-index="26"><div class="ph ph-fog">Photo</div></div>
+    <div class="gallery-cell" data-index="27"><div class="ph ph-warm">Photo</div></div>
+    <div class="gallery-cell" data-index="28"><div class="ph ph-dead">Photo</div></div>
 
-    <!-- Joe Pye Weed · August, 2018 -->
-    <div class="gallery-cell video-cell" data-type="video" data-video-id="ufYKXkjgal8">
-      <img src="https://s3.us-east-005.backblazeb2.com/mtmitchell/pye-thumb.jpg" alt="Joe Pye Weed" loading="lazy" onload="this.classList.add('loaded')">
-      <div class="video-overlay">
-        <div class="video-meta">
-          <p class="video-title-label">Joe Pye Weed</p>
-          <p class="video-date-label">August, 2018</p>
-        </div>
-        <div class="play-indicator">
-          <svg viewBox="0 0 44 44" fill="none"><circle cx="22" cy="22" r="21" stroke="white" stroke-width="1"/><polygon points="18,14 32,22 18,30" fill="white"/></svg>
-        </div>
+    <div class="gallery-cell" data-index="29"><div class="ph ph-haze">Photo</div></div>
+    <div class="gallery-cell" data-index="30"><div class="ph ph-forest">Photo</div></div>
+    <div class="gallery-cell" data-index="31"><div class="ph ph-cloud">Photo</div></div>
+
+    <div class="gallery-cell" data-index="32"><div class="ph ph-dead">Photo</div></div>
+    <div class="gallery-cell video-cell wide" data-type="video" data-video-id="YOUR_YOUTUBE_ID_4">
+      <div class="ph ph-haze">Video</div>
+      <div class="play-indicator">
+        <svg viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="22" cy="22" r="21" stroke="white" stroke-width="1"/>
+          <polygon points="18,14 32,22 18,30" fill="white"/>
+        </svg>
       </div>
     </div>
 
-    <div class="gallery-cell full" data-index="23"><img src="https://s3.us-east-005.backblazeb2.com/mtmitchell/IMG_6360.jpeg" alt="Mt. Mitchell" loading="lazy" onload="this.classList.add('loaded')"></div>
-    <div class="gallery-cell" data-index="24"><img src="https://s3.us-east-005.backblazeb2.com/mtmitchell/4C072CB8-39B8-4FF6-B494-864AFEE7FF6F2022-10-23_11-44-57_175.jpeg" alt="Mt. Mitchell" loading="lazy" onload="this.classList.add('loaded')"></div>
-    <div class="gallery-cell" data-index="25"><img src="https://s3.us-east-005.backblazeb2.com/mtmitchell/0C9AFE49-0345-49C3-9173-95DDBF9738542022-10-23_11-37-12_729.jpeg" alt="Mt. Mitchell" loading="lazy" onload="this.classList.add('loaded')"></div>
-    <div class="gallery-cell" data-index="26"><img src="https://s3.us-east-005.backblazeb2.com/mtmitchell/IMG_7087.JPG" alt="Mt. Mitchell" loading="lazy" onload="this.classList.add('loaded')"></div>
-    <div class="gallery-cell" data-index="27"><img src="https://s3.us-east-005.backblazeb2.com/mtmitchell/IMG_6197.jpeg" alt="Mt. Mitchell" loading="lazy" onload="this.classList.add('loaded')"></div>
-    <div class="gallery-cell" data-index="28"><img src="https://s3.us-east-005.backblazeb2.com/mtmitchell/122DE275-6732-4D8B-879C-9CE709A99A022022-10-23_10-48-28_459.jpeg" alt="Mt. Mitchell" loading="lazy" onload="this.classList.add('loaded')"></div>
-    <div class="gallery-cell" data-index="29"><img src="https://s3.us-east-005.backblazeb2.com/mtmitchell/874DF94F-1DB3-402E-8653-2F8D9B38706735397109591_760228cabd_o.jpg" alt="Mt. Mitchell" loading="lazy" onload="this.classList.add('loaded')"></div>
-    <div class="gallery-cell full" data-index="30"><img src="https://s3.us-east-005.backblazeb2.com/mtmitchell/35527968665_2af45f4333_o.JPG" alt="Mt. Mitchell" loading="lazy" onload="this.classList.add('loaded')"></div>
+    <div class="gallery-cell" data-index="33"><div class="ph ph-fog">Photo</div></div>
+    <div class="gallery-cell" data-index="34"><div class="ph ph-warm">Photo</div></div>
+    <div class="gallery-cell" data-index="35"><div class="ph ph-haze">Photo</div></div>
 
-    <!-- Morning at Maple Camp Bald · June, 2017 -->
-    <div class="gallery-cell video-cell" data-type="video" data-video-id="xfbcg2UW0Go">
-      <img src="https://s3.us-east-005.backblazeb2.com/mtmitchell/morning-thumb.jpg" alt="Morning at Maple Camp Bald" loading="lazy" onload="this.classList.add('loaded')">
-      <div class="video-overlay">
-        <div class="video-meta">
-          <p class="video-title-label">Morning at Maple Camp Bald</p>
-          <p class="video-date-label">June, 2017</p>
-        </div>
-        <div class="play-indicator">
-          <svg viewBox="0 0 44 44" fill="none"><circle cx="22" cy="22" r="21" stroke="white" stroke-width="1"/><polygon points="18,14 32,22 18,30" fill="white"/></svg>
-        </div>
+    <div class="gallery-cell" data-index="36"><div class="ph ph-forest">Photo</div></div>
+    <div class="gallery-cell" data-index="37"><div class="ph ph-dead">Photo</div></div>
+    <div class="gallery-cell" data-index="38"><div class="ph ph-cloud">Photo</div></div>
+
+    <div class="gallery-cell" data-index="39"><div class="ph ph-fog">Photo</div></div>
+    <div class="gallery-cell" data-index="40"><div class="ph ph-haze">Photo</div></div>
+    <div class="gallery-cell video-cell" data-type="video" data-video-id="YOUR_YOUTUBE_ID_5">
+      <div class="ph ph-warm">Video</div>
+      <div class="play-indicator">
+        <svg viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="22" cy="22" r="21" stroke="white" stroke-width="1"/>
+          <polygon points="18,14 32,22 18,30" fill="white"/>
+        </svg>
       </div>
     </div>
 
-    <div class="gallery-cell" data-index="31"><img src="https://s3.us-east-005.backblazeb2.com/mtmitchell/F4E5EB42-5476-44F2-BB54-6800E174A7FA35398926091_fc2bf18c8d_o.jpg" alt="Mt. Mitchell" loading="lazy" onload="this.classList.add('loaded')"></div>
-    <div class="gallery-cell" data-index="32"><img src="https://s3.us-east-005.backblazeb2.com/mtmitchell/779BC693-781B-4BCA-908F-70CC718C95BA35362341852_b6b3bf464f_o_34784192153_o.jpg" alt="Mt. Mitchell" loading="lazy" onload="this.classList.add('loaded')"></div>
-    <div class="gallery-cell" data-index="33"><img src="https://s3.us-east-005.backblazeb2.com/mtmitchell/A974B932-B8D6-4264-8533-31142CBA692234688258714_92ba343e67_o.jpg" alt="Mt. Mitchell" loading="lazy" onload="this.classList.add('loaded')"></div>
-    <div class="gallery-cell" data-index="34"><img src="https://s3.us-east-005.backblazeb2.com/mtmitchell/IMG_5175.JPG" alt="Mt. Mitchell" loading="lazy" onload="this.classList.add('loaded')"></div>
-    <div class="gallery-cell" data-index="35"><img src="https://s3.us-east-005.backblazeb2.com/mtmitchell/IMG_1041.JPG" alt="Mt. Mitchell" loading="lazy" onload="this.classList.add('loaded')"></div>
-    <div class="gallery-cell" data-index="36"><img src="https://s3.us-east-005.backblazeb2.com/mtmitchell/IMG_1016.JPG" alt="Mt. Mitchell" loading="lazy" onload="this.classList.add('loaded')"></div>
-    <div class="gallery-cell" data-index="37"><img src="https://s3.us-east-005.backblazeb2.com/mtmitchell/30513965882_d55f167052_o.JPG" alt="Mt. Mitchell" loading="lazy" onload="this.classList.add('loaded')"></div>
-    <div class="gallery-cell" data-index="38"><img src="https://s3.us-east-005.backblazeb2.com/mtmitchell/6A258626-97E8-4CDE-9078-10495528270E30330975680_cc001843da_o.jpg" alt="Mt. Mitchell" loading="lazy" onload="this.classList.add('loaded')"></div>
-    <div class="gallery-cell" data-index="39"><img src="https://s3.us-east-005.backblazeb2.com/mtmitchell/30594969976_8c7766ccff_o.JPG" alt="Mt. Mitchell" loading="lazy" onload="this.classList.add('loaded')"></div>
+    <!-- ─ Final approach: close-up, intimate, ground-level ─ -->
+    <div class="gallery-cell" data-index="41"><div class="ph ph-forest">Photo</div></div>
+    <div class="gallery-cell" data-index="42"><div class="ph ph-dead">Photo</div></div>
+    <div class="gallery-cell" data-index="43"><div class="ph ph-fog">Photo</div></div>
 
-    <!-- The Doors of Perception on Middle Creek · October, 2016 -->
-    <div class="gallery-cell video-cell" data-type="video" data-video-id="V1gexqIlWgU">
-      <img src="https://s3.us-east-005.backblazeb2.com/mtmitchell/perception-thumb.jpg" alt="The Doors of Perception on Middle Creek" loading="lazy" onload="this.classList.add('loaded')">
-      <div class="video-overlay">
-        <div class="video-meta">
-          <p class="video-title-label">The Doors of Perception on Middle Creek</p>
-          <p class="video-date-label">October, 2016</p>
-        </div>
-        <div class="play-indicator">
-          <svg viewBox="0 0 44 44" fill="none"><circle cx="22" cy="22" r="21" stroke="white" stroke-width="1"/><polygon points="18,14 32,22 18,30" fill="white"/></svg>
-        </div>
+    <div class="gallery-cell" data-index="44"><div class="ph ph-warm">Photo</div></div>
+    <div class="gallery-cell" data-index="45"><div class="ph ph-haze">Photo</div></div>
+    <div class="gallery-cell" data-index="46"><div class="ph ph-forest">Photo</div></div>
+
+    <!-- ─ Last video ─ -->
+    <div class="gallery-cell video-cell wide" data-type="video" data-video-id="YOUR_YOUTUBE_ID_6">
+      <div class="ph ph-fog">Video</div>
+      <div class="play-indicator">
+        <svg viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="22" cy="22" r="21" stroke="white" stroke-width="1"/>
+          <polygon points="18,14 32,22 18,30" fill="white"/>
+        </svg>
       </div>
     </div>
+    <div class="gallery-cell" data-index="47"><div class="ph ph-dead">Photo</div></div>
 
-    <div class="gallery-cell" data-index="40"><img src="https://s3.us-east-005.backblazeb2.com/mtmitchell/28975382015_fa3646cde1_o.jpg" alt="Mt. Mitchell" loading="lazy" onload="this.classList.add('loaded')"></div>
-    <div class="gallery-cell" data-index="41"><img src="https://s3.us-east-005.backblazeb2.com/mtmitchell/28899066761_a570241769_o.jpg" alt="Mt. Mitchell" loading="lazy" onload="this.classList.add('loaded')"></div>
-    <div class="gallery-cell" data-index="42"><img src="https://s3.us-east-005.backblazeb2.com/mtmitchell/IMG_9742.JPG" alt="Mt. Mitchell" loading="lazy" onload="this.classList.add('loaded')"></div>
-    <div class="gallery-cell" data-index="43"><img src="https://s3.us-east-005.backblazeb2.com/mtmitchell/28870907852_6835441bb7_o.jpg" alt="Mt. Mitchell" loading="lazy" onload="this.classList.add('loaded')"></div>
-    <div class="gallery-cell" data-index="44"><img src="https://s3.us-east-005.backblazeb2.com/mtmitchell/A2909AEA-82B5-4722-8BC3-8ED2B954495528870877912_59d01f74e3_o.jpg" alt="Mt. Mitchell" loading="lazy" onload="this.classList.add('loaded')"></div>
-    <div class="gallery-cell" data-index="45"><img src="https://s3.us-east-005.backblazeb2.com/mtmitchell/2242F918-E53E-458C-BC71-F4C81296EE6128870960302_bc103e0d44_o.jpg" alt="Mt. Mitchell" loading="lazy" onload="this.classList.add('loaded')"></div>
-    <div class="gallery-cell" data-index="46"><img src="https://s3.us-east-005.backblazeb2.com/mtmitchell/F830606B-DCF5-4C4C-8FC4-18BC7731107B28690003400_e39d4cf46a_o.jpg" alt="Mt. Mitchell" loading="lazy" onload="this.classList.add('loaded')"></div>
-    <div class="gallery-cell" data-index="47"><img src="https://s3.us-east-005.backblazeb2.com/mtmitchell/28359307213_b55fe8035f_o.jpg" alt="Mt. Mitchell" loading="lazy" onload="this.classList.add('loaded')"></div>
-    <div class="gallery-cell" data-index="48"><img src="https://s3.us-east-005.backblazeb2.com/mtmitchell/28943522256_fb4d140ea1_o.jpg" alt="Mt. Mitchell" loading="lazy" onload="this.classList.add('loaded')"></div>
-    <div class="gallery-cell" data-index="49"><img src="https://s3.us-east-005.backblazeb2.com/mtmitchell/620D121A-01DA-4435-B680-AE1A7B2F7F3828871027652_763858f2b8_o.jpg" alt="Mt. Mitchell" loading="lazy" onload="this.classList.add('loaded')"></div>
-    <div class="gallery-cell" data-index="50"><img src="https://s3.us-east-005.backblazeb2.com/mtmitchell/23FD5665-62AA-47E9-B3E9-F5098B73FCA328899618141_9e7e0cba11_o.jpg" alt="Mt. Mitchell" loading="lazy" onload="this.classList.add('loaded')"></div>
-    <div class="gallery-cell" data-index="51"><img src="https://s3.us-east-005.backblazeb2.com/mtmitchell/IMG_9408.JPG" alt="Mt. Mitchell" loading="lazy" onload="this.classList.add('loaded')"></div>
-
-    <!-- Homage to the Chinese Taoist Poets · August, 2016 -->
-    <div class="gallery-cell video-cell" data-type="video" data-video-id="tevDGK7_cBs">
-      <img src="https://s3.us-east-005.backblazeb2.com/mtmitchell/tao-thumb.jpg" alt="Homage to the Chinese Taoist Poets" loading="lazy" onload="this.classList.add('loaded')">
-      <div class="video-overlay">
-        <div class="video-meta">
-          <p class="video-title-label">Homage to the Chinese Taoist Poets</p>
-          <p class="video-date-label">August, 2016</p>
-        </div>
-        <div class="play-indicator">
-          <svg viewBox="0 0 44 44" fill="none"><circle cx="22" cy="22" r="21" stroke="white" stroke-width="1"/><polygon points="18,14 32,22 18,30" fill="white"/></svg>
-        </div>
-      </div>
-    </div>
+    <!-- ─ Final 3: close-up detail, ground-level ─ -->
+    <div class="gallery-cell" data-index="48"><div class="ph ph-forest">Photo</div></div>
+    <div class="gallery-cell" data-index="49"><div class="ph ph-warm">Photo</div></div>
+    <div class="gallery-cell" data-index="50"><div class="ph ph-dead">Photo</div></div>
 
   </div>
 </section>
 
-<!-- INTERLUDE -->
+<!-- ══ INTERLUDE ══ -->
 <div class="interlude reveal">
   <div class="interlude-inner">
-    <div class="interlude-dots"><span></span><span></span><span></span></div>
-    <p class="interlude-label">Nine years earlier</p>
+    <div class="interlude-dots">
+      <span></span><span></span><span></span>
+    </div>
+    <p class="interlude-label">Ten years earlier</p>
   </div>
 </div>
 
-<!-- ESSAY 2017 -->
+<!-- ══ ESSAY 2016 ══ -->
 <section class="section" id="essay-2016">
   <div class="section-inner">
-    <div class="year-marker reveal">July, 2017</div>
+    <div class="year-marker reveal">2016</div>
     <div class="essay-body reveal">
       <p>Two years ago I hiked for the first time up one of Mt. Mitchell's long backcountry trails to the summit. It felt like I had been granted entrance to another world. I was inspired to write the words below, calling this experience "A Gift." Both years since then Mt. Mitchell has given me gifts that defy a description in the words or the combination of words and photos or videos I often try to use. I just got back from another adventure there and find myself reminiscing on how we form soul-level connections to those places that have the most to teach us.</p>
-      <p>I had arrived several times before by bike and a couple by car to the top of Mt. Mitchell, the crown of the Black Mountains and the highest point east of the Mississippi. This was the first time I got there powered by my own two feet. With my 50th birthday a couple months away, I found myself magnetically drawn here pulled here by something older than my reasons for coming. It was not the first time I would climb that majestic peak this fall.</p>
+      <p>I had arrived several times before by bike and a couple by car to the top of Mt. Mitchell, the crown of the Black Mountains and the highest point east of the Mississippi. This was the first time I got there powered by my own two feet. With my 50th birthday a couple months away, I found myself magnetically drawn here as if to balance some cosmic force I couldn't comprehend. It was not the first time I would climb that majestic peak this fall.</p>
       <p>While milling around among the crowds of people who had driven to the top so they could take photos for Facebook, I spotted a side trail and followed it down the back of the mountain. As it meandered over rocky terrain away from the crowds, at some magical point I realized I was surrounded by the kind of silence that is defined by the absence of human noise. I was still under that dense spruce-fir canopy, but this kind of silence opened up space all around me. I had been craving this, without realizing it until that moment. I kept going. Soon I caught the faint, tantalizing sound of running water. I would have to venture off the trail to find it, and that's just what I was going to do.</p>
-      <pull class="pull">The sound got louder as I crouched and pushed aside the branches in my way.</pull>
+      <pull class="pull">"The sound got louder as I crouched and pushed aside branches."</pull>
       <p>Finally, the woods opened, and my ears were filled with the glorious chaos of a majestic crashing waterfall. Soaked with sweat from 10 miles of uphill hiking, I looked down and in that moment saw my clothes as a burden, the only remaining obstacle between my soul and the perfect alignment with nature I had been closing in on all day. I left them in a pile. I stepped carefully over mossy rocks that had existed for millions of years only to find their way to those exact spots. What similarly mysterious forces smoothed my rough edges and brought me here to take note of them in this moment? I felt exhilaration as I slipped into that cold mountain stream.</p>
       <p>One day I might try to find my way back to this spot, but I knew without a doubt that this moment was as utterly unique as it was perfect. <em>And that it was a gift for me alone.</em></p>
     </div>
   </div>
 </section>
 
-<!-- FOOTER -->
+<!-- ══ FOOTER ══ -->
 <footer>
   <div class="footer-meta">
     <p>Mt. Mitchell · Black Mountains · North Carolina</p>
     <p>6,684 feet · Highest peak east of the Mississippi</p>
     <p class="footer-title" style="margin-top:0.75rem; text-transform:none;">Todd Stabley</p>
-    <p style="margin-top:0.25rem; opacity:0.6;">Photographs, video &amp; writing · 2016–2026</p>
+    <p style="margin-top:0.25rem; opacity:0.6;">Photographs &amp; writing · 2016–2026</p>
   </div>
 </footer>
 
-<!-- LIGHTBOX -->
+<!-- ══ LIGHTBOX ══ -->
 <div id="lightbox">
   <span class="lb-close" id="lb-close">Close</span>
   <span class="lb-nav" id="lb-prev">←</span>
@@ -568,12 +825,18 @@
 </div>
 
 <script>
+  // ── Scroll reveal ──
   const reveals = document.querySelectorAll('.reveal');
   const observer = new IntersectionObserver((entries) => {
-    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); } });
   }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
   reveals.forEach(el => observer.observe(el));
 
+  // ── Gallery lazy load ──
+  // When you add real images, replace the ph divs with:
+  // <img src="YOUR_URL" alt="..." loading="lazy" onload="this.classList.add('loaded')">
+
+  // ── Lightbox ──
   const lightbox = document.getElementById('lightbox');
   const lbClose = document.getElementById('lb-close');
   const lbPrev = document.getElementById('lb-prev');
@@ -585,8 +848,12 @@
     lbItems = [];
     document.querySelectorAll('.gallery-cell').forEach(cell => {
       const img = cell.querySelector('img');
-      if (cell.dataset.type === 'video') return;
+      const type = cell.dataset.type;
+      const videoId = cell.dataset.videoId;
       if (img) lbItems.push({ type: 'image', src: img.src, alt: img.alt });
+      else if (type === 'video' && videoId && !videoId.startsWith('YOUR')) {
+        lbItems.push({ type: 'video', videoId });
+      }
     });
   }
 
@@ -600,25 +867,46 @@
   }
 
   function renderLb() {
-    lightbox.querySelector('img, iframe')?.remove();
+    const existing = lightbox.querySelector('img, iframe');
+    if (existing) existing.remove();
     const item = lbItems[lbIndex];
     if (!item) return;
-    const img = document.createElement('img');
-    img.src = item.src;
-    img.alt = item.alt || '';
-    lightbox.appendChild(img);
+    if (item.type === 'image') {
+      const img = document.createElement('img');
+      img.src = item.src;
+      img.alt = item.alt || '';
+      lightbox.appendChild(img);
+    } else if (item.type === 'video') {
+      const iframe = document.createElement('iframe');
+      iframe.src = `https://www.youtube.com/embed/${item.videoId}?autoplay=1&rel=0&modestbranding=1`;
+      iframe.allow = 'autoplay; encrypted-media';
+      iframe.allowFullscreen = true;
+      lightbox.appendChild(iframe);
+    }
   }
 
   function closeLightbox() {
     lightbox.classList.remove('open');
     document.body.style.overflow = '';
-    lightbox.querySelector('img, iframe')?.remove();
+    const existing = lightbox.querySelector('img, iframe');
+    if (existing) existing.remove();
   }
 
   lbClose.addEventListener('click', closeLightbox);
   lightbox.addEventListener('click', e => { if (e.target === lightbox) closeLightbox(); });
-  lbPrev.addEventListener('click', e => { e.stopPropagation(); lbIndex = (lbIndex - 1 + lbItems.length) % lbItems.length; renderLb(); });
-  lbNext.addEventListener('click', e => { e.stopPropagation(); lbIndex = (lbIndex + 1) % lbItems.length; renderLb(); });
+
+  lbPrev.addEventListener('click', e => {
+    e.stopPropagation();
+    lbIndex = (lbIndex - 1 + lbItems.length) % lbItems.length;
+    renderLb();
+  });
+
+  lbNext.addEventListener('click', e => {
+    e.stopPropagation();
+    lbIndex = (lbIndex + 1) % lbItems.length;
+    renderLb();
+  });
+
   document.addEventListener('keydown', e => {
     if (!lightbox.classList.contains('open')) return;
     if (e.key === 'Escape') closeLightbox();
@@ -626,24 +914,17 @@
     if (e.key === 'ArrowRight') { lbIndex = (lbIndex + 1) % lbItems.length; renderLb(); }
   });
 
+  // ── Gallery cell click ──
   document.querySelectorAll('.gallery-cell').forEach((cell, i) => {
     cell.addEventListener('click', () => {
-      if (cell.dataset.type === 'video') {
-        const iframe = document.createElement('iframe');
-        iframe.src = `https://www.youtube.com/embed/${cell.dataset.videoId}?autoplay=1&rel=0&modestbranding=1`;
-        iframe.allow = 'autoplay; encrypted-media';
-        iframe.allowFullscreen = true;
-        lightbox.querySelector('img, iframe')?.remove();
-        lightbox.appendChild(iframe);
-        lightbox.classList.add('open');
-        document.body.style.overflow = 'hidden';
-        return;
-      }
       buildLbItems();
+      const type = cell.dataset.type;
       const img = cell.querySelector('img');
+      // Find lb index
       let targetIdx = 0;
       lbItems.forEach((item, idx) => {
-        if (img && item.src === img.src) targetIdx = idx;
+        if (type === 'video' && item.type === 'video' && item.videoId === cell.dataset.videoId) targetIdx = idx;
+        if (img && item.type === 'image' && item.src === img.src) targetIdx = idx;
       });
       openLightbox(targetIdx);
     });
