@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gallery Sorter — Mt. Mitchell</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #f2efeb;
+    --bg2: #e8e4df;
+    --ink: #1e2a30;
+    --ink-mid: #4a5a62;
+    --ink-light: #8a9a9a;
+    --accent: #7a9aaa;
+    --warm: #c08040;
+    --rule: rgba(42,53,64,0.12);
+    --sans: 'system-ui', sans-serif;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--sans);
+    font-size: 14px;
+    line-height: 1.5;
+    min-height: 100vh;
+  }
+
+  header {
+    background: #2a3540;
+    color: rgba(210,228,236,0.85);
+    padding: 1.25rem 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  header h1 {
+    font-size: 15px;
+    font-weight: 400;
+    letter-spacing: 0.05em;
+  }
+
+  header p {
+    font-size: 12px;
+    opacity: 0.55;
+  }
+
+  .controls {
+    padding: 1.25rem 2rem;
+    background: var(--bg2);
+    border-bottom: 0.5px solid var(--rule);
+    display: flex;
+    gap: 1rem;
+    align-items: flex-end;
+    flex-wrap: wrap;
+  }
+
+  .control-group {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .control-group label {
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--ink-light);
+  }
+
+  input[type="text"] {
+    background: white;
+    border: 0.5px solid rgba(42,53,64,0.2);
+    border-radius: 6px;
+    padding: 7px 10px;
+    font-size: 13px;
+    color: var(--ink);
+    width: 380px;
+    outline: none;
+  }
+
+  input[type="text"]:focus { border-color: var(--accent); }
+
+  button {
+    background: #2a3540;
+    color: rgba(210,228,236,0.9);
+    border: none;
+    border-radius: 6px;
+    padding: 8px 16px;
+    font-size: 13px;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+
+  button:hover { background: #3a4a58; }
+  button:disabled { opacity: 0.4; cursor: default; }
+
+  button.secondary {
+    background: white;
+    color: var(--ink);
+    border: 0.5px solid rgba(42,53,64,0.2);
+  }
+
+  button.secondary:hover { background: var(--bg2); }
+
+  button.warm {
+    background: var(--warm);
+    color: white;
+  }
+
+  button.warm:hover { background: #a06030; }
+
+  .status {
+    padding: 0.75rem 2rem;
+    font-size: 12px;
+    color: var(--ink-light);
+    border-bottom: 0.5px solid var(--rule);
+    min-height: 36px;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .status span { color: var(--ink-mid); }
+
+  /* Unplaced pool */
+  #pool-section {
+    padding: 1.25rem 2rem 0.5rem;
+  }
+
+  #pool-section h2 {
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--ink-light);
+    margin-bottom: 1rem;
+  }
+
+  #pool {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    min-height: 80px;
+    padding: 10px;
+    background: white;
+    border: 0.5px solid var(--rule);
+    border-radius: 8px;
+  }
+
+  #pool.drag-over {
+    border-color: var(--accent);
+    background: #f0f6f8;
+  }
+
+  /* Gallery arrangement */
+  #gallery-section {
+    padding: 1.25rem 2rem 2rem;
+  }
+
+  #gallery-section h2 {
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--ink-light);
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  #gallery-drop {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 4px;
+    min-height: 200px;
+    padding: 6px;
+    background: white;
+    border: 0.5px solid var(--rule);
+    border-radius: 8px;
+  }
+
+  #gallery-drop.drag-over {
+    border-color: var(--accent);
+  }
+
+  /* Thumb cards */
+  .thumb {
+    position: relative;
+    background: #d0d8dc;
+    border-radius: 4px;
+    overflow: hidden;
+    cursor: grab;
+    user-select: none;
+    border: 1.5px solid transparent;
+    transition: border-color 0.15s, transform 0.15s;
+  }
+
+  .thumb:active { cursor: grabbing; transform: scale(0.97); }
+  .thumb.selected { border-color: var(--warm); }
+  .thumb.dragging { opacity: 0.4; }
+
+  /* Pool thumbs are smaller */
+  #pool .thumb {
+    width: 80px;
+    height: 80px;
+    flex-shrink: 0;
+  }
+
+  /* Gallery thumbs fill grid cell */
+  #gallery-drop .thumb {
+    aspect-ratio: 1;
+    width: 100%;
+  }
+
+  #gallery-drop .thumb.wide  { grid-column: span 2; aspect-ratio: 2/1; }
+  #gallery-drop .thumb.full  { grid-column: span 3; aspect-ratio: 3/1; }
+  #gallery-drop .thumb.tall  { grid-row: span 2; aspect-ratio: 1/2; }
+  #gallery-drop .thumb.featured { grid-column: span 2; grid-row: span 2; aspect-ratio: 1; }
+
+  .thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    pointer-events: none;
+  }
+
+  .thumb .thumb-name {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(18,24,28,0.7);
+    color: rgba(220,235,240,0.9);
+    font-size: 9px;
+    padding: 3px 5px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+
+  .thumb:hover .thumb-name { opacity: 1; }
+
+  /* Video badge */
+  .thumb .video-badge {
+    position: absolute;
+    top: 4px;
+    left: 4px;
+    background: rgba(192,128,64,0.85);
+    color: white;
+    font-size: 8px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 2px 5px;
+    border-radius: 3px;
+  }
+
+  /* Override controls shown when thumb is selected */
+  #override-panel {
+    display: none;
+    padding: 0.75rem 2rem;
+    background: #fdf8f2;
+    border-top: 0.5px solid rgba(192,128,64,0.2);
+    border-bottom: 0.5px solid rgba(192,128,64,0.2);
+    gap: 0.75rem;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  #override-panel.visible { display: flex; }
+
+  #override-panel p {
+    font-size: 12px;
+    color: var(--ink-mid);
+  }
+
+  .override-btn {
+    font-size: 11px;
+    padding: 4px 10px;
+    border-radius: 4px;
+    background: white;
+    color: var(--ink);
+    border: 0.5px solid rgba(42,53,64,0.2);
+    cursor: pointer;
+  }
+
+  .override-btn:hover { background: var(--bg2); }
+  .override-btn.active { background: var(--warm); color: white; border-color: var(--warm); }
+
+  /* Drop placeholder in gallery */
+  .drop-placeholder {
+    border: 1.5px dashed var(--accent);
+    border-radius: 4px;
+    background: #f0f6f8;
+    aspect-ratio: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    color: var(--accent);
+    letter-spacing: 0.1em;
+  }
+
+  /* Output */
+  #output-section {
+    padding: 1.25rem 2rem 3rem;
+    display: none;
+  }
+
+  #output-section h2 {
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--ink-light);
+    margin-bottom: 0.75rem;
+  }
+
+  #output-code {
+    background: #1e2a30;
+    color: #b0d0d8;
+    font-family: monospace;
+    font-size: 12px;
+    line-height: 1.6;
+    padding: 1.25rem;
+    border-radius: 8px;
+    white-space: pre-wrap;
+    word-break: break-all;
+    max-height: 400px;
+    overflow-y: auto;
+  }
+
+  .empty-state {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 160px;
+    font-size: 12px;
+    color: var(--ink-light);
+    letter-spacing: 0.1em;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1>Gallery Sorter — 6,684 Feet</h1>
+    <p>Arrange your photos and videos, set overrides, then copy the generated code</p>
+  </div>
+</header>
+
+<div class="controls">
+  <div class="control-group">
+    <label>Backblaze base URL</label>
+    <input type="text" id="base-url" value="https://s3.us-east-005.backblazeb2.com/mtmitchell/" placeholder="https://s3.us-east-005.backblazeb2.com/mtmitchell/">
+  </div>
+  <button id="load-btn" onclick="loadFiles()">Load Files</button>
+  <button class="secondary" onclick="clearGallery()">Clear gallery</button>
+  <button class="warm" onclick="generateCode()">Generate code ↗</button>
+</div>
+
+<div class="status" id="status">
+  <span>Enter your Backblaze base URL and click Load Files</span>
+</div>
+
+<div id="override-panel">
+  <p>Selected: <strong id="selected-name">—</strong></p>
+  <button class="override-btn active" data-class="" onclick="setOverride('')">Square (default)</button>
+  <button class="override-btn" data-class="wide" onclick="setOverride('wide')">Wide (2 col)</button>
+  <button class="override-btn" data-class="full" onclick="setOverride('full')">Full width</button>
+  <button class="override-btn" data-class="tall" onclick="setOverride('tall')">Tall (2 row)</button>
+  <button class="override-btn" data-class="featured" onclick="setOverride('featured')">Featured (2×2)</button>
+  <button class="override-btn" data-class="video" onclick="setOverride('video')">Mark as video</button>
+  <button class="secondary" style="margin-left:auto;" onclick="removeSelected()">Remove from gallery</button>
+</div>
+
+<div id="pool-section">
+  <h2>Unplaced files — drag into gallery below, or click to add</h2>
+  <div id="pool">
+    <div class="empty-state">Load files to begin</div>
+  </div>
+</div>
+
+<div id="gallery-section">
+  <h2>
+    Gallery order
+    <span style="font-weight:400; text-transform:none; letter-spacing:0; font-size:11px; color:var(--ink-light);">Drag to reorder · Click to select · Use override panel to adjust layout</span>
+  </h2>
+  <div id="gallery-drop">
+    <div class="empty-state" id="gallery-empty">Drag files here to arrange your gallery</div>
+  </div>
+</div>
+
+<div id="output-section">
+  <h2>Generated gallery code — paste into mitchell.html</h2>
+  <pre id="output-code"></pre>
+  <button onclick="copyCode()" style="margin-top:0.75rem;">Copy to clipboard</button>
+</div>
+
+<script>
+  const BASE_URL_DEFAULT = 'https://s3.us-east-005.backblazeb2.com/mtmitchell/';
+  const IMAGE_EXTS = ['jpg','jpeg','png','webp','gif','heic'];
+  const VIDEO_EXTS = ['mp4','mov','m4v','webm'];
+
+  let allFiles = [];
+  let galleryItems = []; // {filename, override}
+  let selectedThumb = null;
+  let dragSrc = null;
+  let dragFromPool = false;
+
+  function getBaseUrl() {
+    let url = document.getElementById('base-url').value.trim();
+    if (!url.endsWith('/')) url += '/';
+    return url;
+  }
+
+  async function loadFiles() {
+    const base = getBaseUrl();
+    setStatus('Loading files from Backblaze...');
+    document.getElementById('load-btn').disabled = true;
+
+    // Try S3-compatible ListObjects
+    const listUrl = base.replace(/\/[^/]+\/?$/, '') + '?list-type=2&max-keys=200';
+    // Actually use the bucket list endpoint
+    const bucketName = base.split('/').filter(Boolean).pop();
+    const endpoint = base.split('/').slice(0,3).join('/');
+    const apiUrl = `${endpoint}/${bucketName}?list-type=2&max-keys=200`;
+
+    try {
+      const res = await fetch(apiUrl);
+      const text = await res.text();
+      const parser = new DOMParser();
+      const xml = parser.parseFromString(text, 'application/xml');
+      const keys = [...xml.querySelectorAll('Key')].map(k => k.textContent);
+
+      if (keys.length === 0) throw new Error('No files found');
+
+      allFiles = keys.filter(k => {
+        const ext = k.split('.').pop().toLowerCase();
+        return IMAGE_EXTS.includes(ext) || VIDEO_EXTS.includes(ext);
+      });
+
+      setStatus(`Loaded ${allFiles.length} files. Drag them into the gallery below.`);
+      renderPool();
+    } catch(e) {
+      setStatus(`Could not auto-fetch file list (${e.message}). Paste filenames manually below.`);
+      showManualEntry();
+    }
+
+    document.getElementById('load-btn').disabled = false;
+  }
+
+  function showManualEntry() {
+    const status = document.getElementById('status');
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.placeholder = 'Paste comma-separated filenames, e.g. IMG_001.jpg, IMG_002.jpg';
+    input.style.flex = '1';
+    input.style.marginLeft = '1rem';
+    const btn = document.createElement('button');
+    btn.textContent = 'Add';
+    btn.onclick = () => {
+      const names = input.value.split(',').map(s => s.trim()).filter(Boolean);
+      allFiles = [...new Set([...allFiles, ...names])];
+      renderPool();
+      setStatus(`${allFiles.length} files loaded.`);
+    };
+    status.appendChild(input);
+    status.appendChild(btn);
+  }
+
+  function isVideo(filename) {
+    const ext = filename.split('.').pop().toLowerCase();
+    return VIDEO_EXTS.includes(ext);
+  }
+
+  function renderPool() {
+    const pool = document.getElementById('pool');
+    const inGallery = new Set(galleryItems.map(i => i.filename));
+    const unplaced = allFiles.filter(f => !inGallery.has(f));
+
+    if (unplaced.length === 0) {
+      pool.innerHTML = '<div class="empty-state">All files placed in gallery</div>';
+      return;
+    }
+
+    pool.innerHTML = '';
+    unplaced.forEach(filename => {
+      pool.appendChild(makeThumb(filename, '', true));
+    });
+  }
+
+  function renderGallery() {
+    const drop = document.getElementById('gallery-drop');
+    const empty = document.getElementById('gallery-empty');
+
+    if (galleryItems.length === 0) {
+      drop.innerHTML = '';
+      drop.appendChild(empty || makeEmptyState());
+      return;
+    }
+
+    drop.innerHTML = '';
+    galleryItems.forEach((item, idx) => {
+      const thumb = makeThumb(item.filename, item.override, false);
+      thumb.dataset.galleryIndex = idx;
+      drop.appendChild(thumb);
+    });
+  }
+
+  function makeThumb(filename, override, isPool) {
+    const base = getBaseUrl();
+    const div = document.createElement('div');
+    div.className = 'thumb' + (override ? ' ' + override : '');
+    div.dataset.filename = filename;
+    div.dataset.override = override || '';
+    div.draggable = true;
+
+    const vid = isVideo(filename);
+
+    if (vid) {
+      // Video — show colored placeholder with badge
+      div.style.background = '#3a4e5a';
+      const badge = document.createElement('div');
+      badge.className = 'video-badge';
+      badge.textContent = 'video';
+      div.appendChild(badge);
+    } else {
+      const img = document.createElement('img');
+      img.src = base + encodeURIComponent(filename);
+      img.alt = filename;
+      img.loading = 'lazy';
+      div.appendChild(img);
+    }
+
+    const name = document.createElement('div');
+    name.className = 'thumb-name';
+    name.textContent = filename;
+    div.appendChild(name);
+
+    // Click to select
+    div.addEventListener('click', () => selectThumb(div, filename, override, isPool));
+
+    // Drag events
+    div.addEventListener('dragstart', e => {
+      dragSrc = div;
+      dragFromPool = isPool;
+      div.classList.add('dragging');
+      e.dataTransfer.effectAllowed = 'move';
+      e.dataTransfer.setData('text/plain', filename + '|' + (override||'') + '|' + (isPool ? 'pool' : 'gallery'));
+    });
+
+    div.addEventListener('dragend', () => {
+      div.classList.remove('dragging');
+      dragSrc = null;
+    });
+
+    if (!isPool) {
+      div.addEventListener('dragover', e => {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
+      });
+
+      div.addEventListener('drop', e => {
+        e.preventDefault();
+        e.stopPropagation();
+        const data = e.dataTransfer.getData('text/plain').split('|');
+        const srcFilename = data[0];
+        const srcOverride = data[1];
+        const srcFrom = data[2];
+        const targetIdx = parseInt(div.dataset.galleryIndex);
+
+        if (srcFrom === 'pool') {
+          // Add from pool before this item
+          galleryItems.splice(targetIdx, 0, { filename: srcFilename, override: srcOverride });
+        } else {
+          // Reorder within gallery
+          const srcIdx = galleryItems.findIndex(i => i.filename === srcFilename);
+          if (srcIdx !== -1 && srcIdx !== targetIdx) {
+            const [item] = galleryItems.splice(srcIdx, 1);
+            const newTarget = srcIdx < targetIdx ? targetIdx - 1 : targetIdx;
+            galleryItems.splice(newTarget, 0, item);
+          }
+        }
+        renderPool();
+        renderGallery();
+        deselect();
+      });
+    }
+
+    // Pool click-to-add
+    if (isPool) {
+      div.addEventListener('dblclick', () => {
+        galleryItems.push({ filename, override: isVideo(filename) ? 'video' : '' });
+        renderPool();
+        renderGallery();
+      });
+    }
+
+    return div;
+  }
+
+  // Drop on gallery background
+  const galleryDrop = document.getElementById('gallery-drop');
+
+  galleryDrop.addEventListener('dragover', e => {
+    e.preventDefault();
+    galleryDrop.classList.add('drag-over');
+  });
+
+  galleryDrop.addEventListener('dragleave', () => galleryDrop.classList.remove('drag-over'));
+
+  galleryDrop.addEventListener('drop', e => {
+    e.preventDefault();
+    galleryDrop.classList.remove('drag-over');
+    const data = e.dataTransfer.getData('text/plain').split('|');
+    const srcFilename = data[0];
+    const srcOverride = data[1];
+    const srcFrom = data[2];
+
+    if (srcFrom === 'pool') {
+      const override = isVideo(srcFilename) ? 'video' : (srcOverride || '');
+      if (!galleryItems.find(i => i.filename === srcFilename)) {
+        galleryItems.push({ filename: srcFilename, override });
+      }
+    }
+    renderPool();
+    renderGallery();
+  });
+
+  // Pool drop (remove from gallery back to pool)
+  const pool = document.getElementById('pool');
+  pool.addEventListener('dragover', e => { e.preventDefault(); pool.classList.add('drag-over'); });
+  pool.addEventListener('dragleave', () => pool.classList.remove('drag-over'));
+  pool.addEventListener('drop', e => {
+    e.preventDefault();
+    pool.classList.remove('drag-over');
+    const data = e.dataTransfer.getData('text/plain').split('|');
+    const srcFilename = data[0];
+    const srcFrom = data[2];
+    if (srcFrom === 'gallery') {
+      galleryItems = galleryItems.filter(i => i.filename !== srcFilename);
+      renderPool();
+      renderGallery();
+      deselect();
+    }
+  });
+
+  function selectThumb(div, filename, override, isPool) {
+    if (selectedThumb) selectedThumb.classList.remove('selected');
+    selectedThumb = div;
+    div.classList.add('selected');
+
+    if (!isPool) {
+      document.getElementById('override-panel').classList.add('visible');
+      document.getElementById('selected-name').textContent = filename;
+      // Highlight active override button
+      document.querySelectorAll('.override-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.class === (override || ''));
+      });
+    }
+  }
+
+  function deselect() {
+    if (selectedThumb) selectedThumb.classList.remove('selected');
+    selectedThumb = null;
+    document.getElementById('override-panel').classList.remove('visible');
+  }
+
+  function setOverride(cls) {
+    if (!selectedThumb) return;
+    const filename = selectedThumb.dataset.filename;
+    const item = galleryItems.find(i => i.filename === filename);
+    if (item) {
+      item.override = cls;
+      renderGallery();
+      // Re-select
+      const newThumb = document.querySelector(`#gallery-drop .thumb[data-filename="${CSS.escape(filename)}"]`);
+      if (newThumb) selectThumb(newThumb, filename, cls, false);
+    }
+    document.querySelectorAll('.override-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.class === cls);
+    });
+  }
+
+  function removeSelected() {
+    if (!selectedThumb) return;
+    const filename = selectedThumb.dataset.filename;
+    galleryItems = galleryItems.filter(i => i.filename !== filename);
+    renderPool();
+    renderGallery();
+    deselect();
+  }
+
+  function clearGallery() {
+    galleryItems = [];
+    renderPool();
+    renderGallery();
+    deselect();
+  }
+
+  function generateCode() {
+    if (galleryItems.length === 0) {
+      alert('Add some items to the gallery first.');
+      return;
+    }
+
+    const base = getBaseUrl();
+    let idx = 0;
+    const lines = galleryItems.map(item => {
+      const url = base + encodeURIComponent(item.filename);
+      const cls = item.override ? ` ${item.override}` : '';
+
+      if (item.override === 'video') {
+        // YouTube embed placeholder
+        return `    <!-- VIDEO: ${item.filename} -->
+    <div class="gallery-cell video-cell${cls.replace('video','').trim() ? ' '+cls.trim() : ''}" data-type="video" data-video-id="YOUR_YOUTUBE_ID">
+      <div class="ph ph-haze">Video</div>
+      <div class="play-indicator">
+        <svg viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="22" cy="22" r="21" stroke="white" stroke-width="1"/>
+          <polygon points="18,14 32,22 18,30" fill="white"/>
+        </svg>
+      </div>
+    </div>`;
+      } else {
+        const dataIdx = idx++;
+        return `    <div class="gallery-cell${cls}" data-index="${dataIdx}">
+      <img src="${url}" alt="Mt. Mitchell" loading="lazy" onload="this.classList.add('loaded')">
+    </div>`;
+      }
+    });
+
+    const code = `  <!-- ═ GALLERY GRID ═ -->\n  <div class="gallery-grid" id="gallery-grid">\n\n${lines.join('\n\n')}\n\n  </div>`;
+
+    document.getElementById('output-section').style.display = 'block';
+    document.getElementById('output-code').textContent = code;
+    document.getElementById('output-section').scrollIntoView({ behavior: 'smooth' });
+    setStatus(`Code generated for ${galleryItems.length} items. Copy and paste into mitchell.html.`);
+  }
+
+  function copyCode() {
+    const code = document.getElementById('output-code').textContent;
+    navigator.clipboard.writeText(code).then(() => {
+      setStatus('Copied to clipboard.');
+    });
+  }
+
+  function setStatus(msg) {
+    const s = document.getElementById('status');
+    // Keep any child inputs/buttons, just update first text node
+    const span = s.querySelector('span') || s;
+    if (s.querySelector('span')) {
+      s.querySelector('span').textContent = msg;
+    } else {
+      s.textContent = msg;
+    }
+  }
+
+  // Auto-load on page open with default URL
+  window.addEventListener('load', () => {
+    // Pre-fill and prompt
+    setStatus('Click "Load Files" to fetch your images from Backblaze.');
+  });
+</script>
+</body>
+</html>
