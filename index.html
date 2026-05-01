@@ -679,7 +679,7 @@
     const label = isVideo
       ? 'video: ' + (titleEl ? titleEl.textContent : cell.dataset.videoId)
       : 'photo: ' + (img ? img.src.split('/').pop() : 'unknown');
-    cell.setAttribute('data-umami-event', label);
+      if (window.umami) window.umami.track(label);
   });
 </script>
 </body>
