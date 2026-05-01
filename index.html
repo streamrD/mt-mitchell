@@ -650,6 +650,15 @@
 
   document.querySelectorAll('.gallery-cell').forEach((cell, i) => {
     cell.addEventListener('click', () => {
+      // Umami click tracking
+      const isVideo = cell.dataset.type === 'video';
+      const titleEl = cell.querySelector('p.video-title-label');
+      const imgEl = cell.querySelector('img');
+      const label = isVideo
+        ? 'video: ' + (titleEl ? titleEl.textContent : cell.dataset.videoId)
+        : 'photo: ' + (imgEl ? imgEl.src.split('/').pop() : 'unknown');
+      if (window.umami) window.umami.track(label);
+
       if (cell.dataset.type === 'video') {
         const iframe = document.createElement('iframe');
         iframe.src = `https://www.youtube.com/embed/${cell.dataset.videoId}?autoplay=1&rel=0&modestbranding=1`;
@@ -671,18 +680,7 @@
     });
   });
 
-// Umami click tracking
-  document.querySelectorAll('.gallery-cell').forEach(cell => {
-    cell.addEventListener('click', () => {
-      const isVideo = cell.dataset.type === 'video';
-      const titleEl = cell.querySelector('p.video-title-label');
-      const img = cell.querySelector('img');
-      const label = isVideo
-        ? 'video: ' + (titleEl ? titleEl.textContent : cell.dataset.videoId)
-        : 'photo: ' + (img ? img.src.split('/').pop() : 'unknown');
-      if (window.umami) window.umami.track(label);
-    });
-  });
+
 </script>
 </body>
 </html>
