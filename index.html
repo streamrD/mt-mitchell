@@ -671,15 +671,17 @@
     });
   });
 
-  // Umami click tracking
+// Umami click tracking
   document.querySelectorAll('.gallery-cell').forEach(cell => {
-    const isVideo = cell.dataset.type === 'video';
-    const titleEl = cell.querySelector('p.video-title-label');
-    const img = cell.querySelector('img');
-    const label = isVideo
-      ? 'video: ' + (titleEl ? titleEl.textContent : cell.dataset.videoId)
-      : 'photo: ' + (img ? img.src.split('/').pop() : 'unknown');
+    cell.addEventListener('click', () => {
+      const isVideo = cell.dataset.type === 'video';
+      const titleEl = cell.querySelector('p.video-title-label');
+      const img = cell.querySelector('img');
+      const label = isVideo
+        ? 'video: ' + (titleEl ? titleEl.textContent : cell.dataset.videoId)
+        : 'photo: ' + (img ? img.src.split('/').pop() : 'unknown');
       if (window.umami) window.umami.track(label);
+    });
   });
 </script>
 </body>
