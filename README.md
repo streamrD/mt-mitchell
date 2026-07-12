@@ -43,8 +43,8 @@ mt-mitchell/
 4. `#essay-2026` — April 2026 essay with pull quotes
 5. `.elevation-divider` — decorative divider
 6. `#gallery` — photo/video grid
-7. `.interlude` — "Nine years earlier" separator
-8. `#essay-2016` — July 2017 essay (warm color scheme)
+7. `.interlude` — decorative dots separator
+8. `#essay-2016` — July 2017 essay (warm color scheme), with "A Gift" title before the original essay text
 9. `<footer>` — credit line, author name
 10. `#lightbox` — hidden overlay for full-size images and video playback
 11. `<script>` — scroll reveal, lightbox logic, gallery click handlers with Umami tracking
@@ -117,7 +117,7 @@ CSS Grid, 3 columns, 2px gap. Cell override classes:
 
 1. **Never copy files from Downloads** — the browser caches downloaded files and the stale version will wipe Backblaze URLs from index.html
 2. **Always edit index.html directly** in Terminal using Python's `str.replace()` for targeted changes, or VS Code for larger edits
-3. **Always verify after edits:** `grep -c "backblazeb2" index.html` should return **60**
+3. **Always verify after edits:** `grep -c "backblazeb2" index.html` should return **63**
 4. **Standard deploy:**
 ```bash
 git add index.html
