@@ -6,6 +6,18 @@
 
 A single-page photo/video/essay website documenting ten years of experiences on Mt. Mitchell, NC. Built as a single HTML file with no frameworks or build tools.
 
+There are **two** things in this repo, and forgetting the second one causes
+real damage:
+
+1. **`index.html`** — the site itself. One file, everything in it.
+2. **`sorter.html`** — a drag-and-drop tool for reordering the gallery, which
+   *generates the gallery HTML you paste back into `index.html`*. See
+   **[Sorter Tool](#sorter-tool)** — read it before touching the gallery.
+
+Photos are not in this repo. They live in a Backblaze B2 bucket, and the page
+reads downscaled **[Image Tiers](#image-tiers)**, never the full-resolution
+originals.
+
 ---
 
 ## Technology Stack
@@ -27,12 +39,90 @@ A single-page photo/video/essay website documenting ten years of experiences on 
 
 ```
 mt-mitchell/
-├── index.html        ← entire site (HTML/CSS/JS, ~850 lines)
-├── sorter.html       ← gallery ordering tool (internal use)
+├── index.html        ← entire site (HTML/CSS/JS, ~740 lines)
+├── sorter.html       ← gallery ordering tool — GENERATES index.html's gallery
+│                       markup. Must stay in sync with index.html. See below.
 ├── serve.json        ← Railway static serve config
 ├── package.json      ← defines start command for Railway
 ├── README.md         ← this file
 ```
+
+Local `*.jpg` / `*.JPG` / `*.jpeg` / `*.HEIC` files are the photo originals.
+They are **gitignored** — the repo has never contained them. They exist on the
+Mac and in the B2 bucket, and nowhere else, so B2 is the only offsite copy.
+
+---
+
+## Sorter Tool
+
+> **This is easy to forget exists, and that is exactly how the gallery gets
+> damaged.** It is not a viewer — it *writes* the markup `index.html` uses.
+
+**Local:** `http://localhost:PORT/sorter.html` · **Live:** https://mt-mitchell.up.railway.app/sorter.html
+
+A drag-and-drop tool for reordering the gallery. All 60 items (55 photos +
+5 videos) are pre-loaded in the current curated order, with a built-in preview
+mode. You rearrange, click generate, and paste the result into `index.html`.
+
+It reads `display/1600/` for its own thumbnails and `display/2800/` in preview —
+never the bucket-root originals.
+
+### The rule
+
+**`generateCode()` must emit markup identical to what `index.html` ships.** It
+currently produces:
+
+- `src` on the tier implied by the override class — `wide` / `full` /
+  `featured` → 2800, everything else → 1600
+- `data-full` on 2800 for every photo
+- Backblaze video posters, *not* YouTube thumbnails
+
+If you change how images are referenced in `index.html`, change
+`generateCode()` in the same commit. Otherwise the next paste silently reverts
+it, and nothing will error — the page just quietly gets worse.
+
+### Why the warning is this strong
+
+As of Aug 2026 the sorter had drifted from the gallery in three ways, none of
+which would have thrown an error:
+
+| Drift | What the next paste would have done |
+|---|---|
+| List missing `waterfall.jpg`, `middle-creek-rapid.jpg`, `mtmitchell-from-mtfarm.jpg` | **Dropped three live photos** off the site |
+| `generateCode()` emitted bucket-root originals | Reverted the image tiers — back to 203.5 MB |
+| Video posters used YouTube's 320×180 `mqdefault.jpg` | Undone `c2c0970`, downgrading all five posters |
+
+All three are fixed. The item list is now rebuilt from `index.html`'s live
+order, and its output is verified to match the live gallery cell-for-cell. If
+you ever suspect drift, the check is to generate code and diff it against the
+`<div class="gallery-grid">` blocks in `index.html` — they should be identical.
+
+---
+
+## Performance
+
+The page ships downscaled derivatives instead of full-resolution originals.
+Current cost of a visit:
+
+| | Before (Aug 2026) | Now | |
+|---|---|---|---|
+| Scroll the entire gallery | 203.5 MB | **31.6 MB** | −84.5% |
+| Landing hero (LCP element) | 3.68 MB | **295 KB** | −92% |
+| Open one photo | free — already downloaded | **1.21 MB** avg | prefetched on hover |
+| Scroll everything + open 20 photos | 203.5 MB | **55.8 MB** | −73% |
+| Bucket objects / size | 77 / 274.6 MB | 188 / 341.0 MB | derivatives added |
+
+The originals were being loaded straight into grid cells a few hundred pixels
+wide — `IMG_6968.JPG` is 11.2 MB at 5712×4284, rendered into roughly 480 px.
+The hero was 8981 px wide for a `100vh` `object-fit: cover` backdrop.
+
+The 31.6 MB also arrives *first*, with enlargements fetched only for photos
+someone actually shows interest in — so time-to-usable-page improved far more
+than the totals alone suggest.
+
+Trade-off worth knowing: previously the grid image *was* the enlargement, so
+clicking was free. Now a click needs a different file. Three mechanisms hide
+that — see **Latency** under [Image Tiers](#image-tiers).
 
 ---
 
@@ -100,15 +190,20 @@ page links to those any more — the page reads from two generated tiers instead
 
 | Tier | Used by | Files | Size |
 |---|---|---|---|
-| `display/1600/` | the 52 one-third-width grid cells | 52 | 25.0 MB |
-| `display/2800/` | all 55 enlargements, the 8 full-bleed grid cells (5 video posters + 2 `.full` + 1 `.wide`), and the landing panorama | 61 | 64.4 MB |
+| `display/1600/` | the 52 one-third-width grid cells, plus all 55 photos for the sorter's thumbnails | 55 | 27.9 MB |
+| `display/2800/` | all 55 enlargements, the 8 full-bleed grid cells (5 video posters + 2 `.full` + 1 `.wide`), and the landing panorama | 61 | 69.0 MB |
 
 Both tiers are JPEG quality 82, progressive, generated with Pillow/Lanczos.
 Filenames and capitalization match the original exactly, so a tier URL is just
 the base URL plus a path prefix.
 
+The 1600 tier carries three photos the *page* does not use at that size —
+`35527968665_2af45f4333_o.JPG`, `IMG_6360.jpeg`, `IMG_7681.JPG` are full-bleed
+cells that render from 2800. They exist at 1600 so the sorter has a small
+thumbnail for every photo.
+
 **Why:** scrolling the whole gallery used to pull 203.5 MB of full-resolution
-originals into cells a few hundred pixels wide. It now pulls 29.5 MB — 85.5%
+originals into cells a few hundred pixels wide. It now pulls 31.6 MB — 84.5%
 less. Ten older Flickr-sourced images are narrower than 2800px and were not
 upscaled; they sit at their native width in the 2800 tier.
 
@@ -248,33 +343,54 @@ git push
 
 ---
 
-## Sorter Tool
-
-Available at `https://mt-mitchell.up.railway.app/sorter.html`
-
-- Drag-and-drop gallery ordering tool
-- All 60 items (55 photos + 5 videos) pre-loaded in current curated order
-- Generates gallery HTML code for pasting into index.html
-- Has built-in preview mode
-- Reads `display/1600/` for its own thumbnails and `display/2800/` in preview — never the bucket-root originals
-
-**Its output must stay identical to what `index.html` ships.** `generateCode()`
-emits the tiered markup: `src` on the tier implied by the override class
-(`wide`/`full`/`featured` → 2800, otherwise 1600), plus `data-full` on 2800, and
-Backblaze video posters. If you change how images are referenced in
-`index.html`, change `generateCode()` in the same commit or the next paste will
-silently revert it.
-
-> The sorter's list had drifted out of sync — it was missing `waterfall.jpg`,
-> `middle-creek-rapid.jpg`, and `mtmitchell-from-mtfarm.jpg`, so generating code
-> from it would have dropped three live photos from the page. It also still
-> emitted YouTube's 320×180 `mqdefault.jpg` for video posters, undoing `c2c0970`.
-> Both are fixed; the list is now rebuilt from `index.html`'s live order.
-
----
-
 ## Known Issues / Gotchas
 
 - The chat interface mangles CSS selectors like `p.video-title-label` into markdown links — always use Python string replacement or VS Code for edits involving that string
 - Backblaze CORS is set to "Share with all HTTPS origins"
 - All five video thumbnails confirmed working: `clouds-thumb.jpg`, `pye-thumb.jpg`, `morning-thumb.jpg`, `perception-thumb.jpg`, `tao-thumb.jpg`
+- **EXIF orientation** breaks Pillow-generated derivatives — see the warning under *Regenerating tiers*. Seven originals are affected. Symptom: correct on disk and in Preview, rotated 90° or 180° on the page
+- **The sorter can silently damage the gallery** if it drifts from `index.html` — see [Sorter Tool](#sorter-tool). It fails quietly, never loudly
+- `railway.json` and `package.json` specify different start commands. Production demonstrably serves `serve.json`'s headers (`x-robots-tag: all`, `access-control-allow-origin: *`), so `package.json` is winning — but the two disagree, and a Railway config change could flip which one applies
+- Browser caching hides derivative fixes: regenerated images keep the same URL, so a hard refresh (Cmd+Shift+R) is required to see corrections
+- Serving the repo locally, `localhost:PORT/` shows a directory listing rather than the site — use `localhost:PORT/index.html`. Production root is unaffected
+
+---
+
+## Changelog
+
+### Aug 7, 2026 — image tiers, prefetching, sorter resync
+
+**`cb7de57` — serve resized display tiers, prefetch enlargements**
+
+Moved every image on the page onto the two generated tiers and added the
+latency machinery. Gallery scroll 203.5 MB → 31.6 MB, hero 3.68 MB → 295 KB.
+
+Also fixed a bug this change would otherwise have introduced: the lightbox
+found its index by comparing `item.src` to `img.src`, which are different tiers
+now — every click would have silently opened the *first* photo.
+
+**`dc794fb` — resync sorter with index.html, put it on the display tiers**
+
+The sorter had drifted three ways, each of which would have damaged the site on
+the next paste. See [Sorter Tool](#sorter-tool). Its item list is now rebuilt
+from `index.html`'s live order, and its generated markup is verified to match
+the live gallery cell-for-cell.
+
+**`cf6f67a` — document the EXIF orientation trap**
+
+Seven photos rendered rotated after the first tier generation, because Pillow
+ignores the EXIF Orientation tag and dropped it on save. Six were also the wrong
+aspect ratio — portrait sources treated as landscape. All 14 affected
+derivatives were regenerated with `ImageOps.exif_transpose` and re-verified;
+the trap is documented under *Regenerating tiers*.
+
+**Housekeeping (no commit — bucket only)**
+
+- Deleted 5 stale `*-thumb.png` video posters, superseded by `.jpg` in
+  `58fc44e`. Bucket 193 → 188 objects, 29.0 MB freed.
+- Pulled `IMG_7661.jpg` and `IMG_7746.JPG` down to the Mac. They had existed
+  **only** in B2 — no local copy anywhere. Both verified byte-identical.
+
+**Still true and worth watching:** the bucket-root originals remain the only
+offsite copy of every photo. `.gitignore` excludes them, so git will never
+protect them.
