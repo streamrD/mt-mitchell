@@ -226,9 +226,23 @@ git push
 Available at `https://mt-mitchell.up.railway.app/sorter.html`
 
 - Drag-and-drop gallery ordering tool
-- All 57 items (52 photos + 5 videos) pre-loaded in current curated order
+- All 60 items (55 photos + 5 videos) pre-loaded in current curated order
 - Generates gallery HTML code for pasting into index.html
 - Has built-in preview mode
+- Reads `display/1600/` for its own thumbnails and `display/2800/` in preview — never the bucket-root originals
+
+**Its output must stay identical to what `index.html` ships.** `generateCode()`
+emits the tiered markup: `src` on the tier implied by the override class
+(`wide`/`full`/`featured` → 2800, otherwise 1600), plus `data-full` on 2800, and
+Backblaze video posters. If you change how images are referenced in
+`index.html`, change `generateCode()` in the same commit or the next paste will
+silently revert it.
+
+> The sorter's list had drifted out of sync — it was missing `waterfall.jpg`,
+> `middle-creek-rapid.jpg`, and `mtmitchell-from-mtfarm.jpg`, so generating code
+> from it would have dropped three live photos from the page. It also still
+> emitted YouTube's 320×180 `mqdefault.jpg` for video posters, undoing `c2c0970`.
+> Both are fixed; the list is now rebuilt from `index.html`'s live order.
 
 ---
 

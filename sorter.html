@@ -429,9 +429,16 @@
 <script>
 const BASE = 'https://s3.us-east-005.backblazeb2.com/mtmitchell/';
 
+// Images live in two generated tiers (see README > Image Tiers). Full-bleed
+// cells use 2800 in the grid; everything else uses 1600. Never link the
+// bucket-root originals from a page -- they are multi-megabyte masters.
+const FULL_BLEED = ['wide', 'full', 'featured'];
+const gridTier = (override) => FULL_BLEED.includes(override) ? 2800 : 1600;
+const tierUrl = (tier, filename) => `${BASE}display/${tier}/${encodeURIComponent(filename)}`;
+
 // Final curated gallery order
 let gallery = [
-  { type: 'video', title: 'The Clouds', date: 'April, 2026', youtubeId: 'nk68MfdAjwA' },
+  { type: 'video', title: 'The Clouds', date: 'April, 2026', youtubeId: 'nk68MfdAjwA', thumb: 'clouds-thumb.jpg' },
   { type: 'photo', filename: 'IMG_7681.JPG', override: 'wide' },
   { type: 'photo', filename: 'IMG_6867.JPG', override: '' },
   { type: 'photo', filename: 'IMG_7133.JPG', override: '' },
@@ -454,17 +461,20 @@ let gallery = [
   { type: 'photo', filename: 'IMG_6899.JPG', override: '' },
   { type: 'photo', filename: 'PXL_20240915_134927818_Original.jpg', override: '' },
   { type: 'photo', filename: 'IMG_6259.jpeg', override: '' },
+  { type: 'photo', filename: 'middle-creek-rapid.jpg', override: '' },
+  { type: 'photo', filename: 'waterfall.jpg', override: '' },
   { type: 'photo', filename: 'IMG_2148.jpeg', override: '' },
-  { type: 'video', title: 'Joe Pye Weed', date: 'August, 2018', youtubeId: 'ufYKXkjgal8' },
-  { type: 'photo', filename: 'IMG_6360.jpeg', override: 'full' },
   { type: 'photo', filename: '4C072CB8-39B8-4FF6-B494-864AFEE7FF6F2022-10-23_11-44-57_175.jpeg', override: '' },
+  { type: 'video', title: 'Joe Pye Weed', date: 'August, 2018', youtubeId: 'ufYKXkjgal8', thumb: 'pye-thumb.jpg' },
+  { type: 'photo', filename: 'IMG_6360.jpeg', override: 'full' },
   { type: 'photo', filename: '0C9AFE49-0345-49C3-9173-95DDBF9738542022-10-23_11-37-12_729.jpeg', override: '' },
   { type: 'photo', filename: 'IMG_7087.JPG', override: '' },
   { type: 'photo', filename: 'IMG_6197.jpeg', override: '' },
   { type: 'photo', filename: '122DE275-6732-4D8B-879C-9CE709A99A022022-10-23_10-48-28_459.jpeg', override: '' },
   { type: 'photo', filename: '874DF94F-1DB3-402E-8653-2F8D9B38706735397109591_760228cabd_o.jpg', override: '' },
+  { type: 'photo', filename: 'mtmitchell-from-mtfarm.jpg', override: '' },
   { type: 'photo', filename: '35527968665_2af45f4333_o.JPG', override: 'full' },
-  { type: 'video', title: 'Morning at Maple Camp Bald', date: 'June, 2017', youtubeId: 'xfbcg2UW0Go' },
+  { type: 'video', title: 'Morning at Maple Camp Bald', date: 'June, 2017', youtubeId: 'xfbcg2UW0Go', thumb: 'morning-thumb.jpg' },
   { type: 'photo', filename: 'F4E5EB42-5476-44F2-BB54-6800E174A7FA35398926091_fc2bf18c8d_o.jpg', override: '' },
   { type: 'photo', filename: '779BC693-781B-4BCA-908F-70CC718C95BA35362341852_b6b3bf464f_o_34784192153_o.jpg', override: '' },
   { type: 'photo', filename: 'A974B932-B8D6-4264-8533-31142CBA692234688258714_92ba343e67_o.jpg', override: '' },
@@ -474,7 +484,7 @@ let gallery = [
   { type: 'photo', filename: '30513965882_d55f167052_o.JPG', override: '' },
   { type: 'photo', filename: '6A258626-97E8-4CDE-9078-10495528270E30330975680_cc001843da_o.jpg', override: '' },
   { type: 'photo', filename: '30594969976_8c7766ccff_o.JPG', override: '' },
-  { type: 'video', title: 'The Doors of Perception on Middle Creek', date: 'October, 2016', youtubeId: 'V1gexqIlWgU' },
+  { type: 'video', title: 'The Doors of Perception on Middle Creek', date: 'October, 2016', youtubeId: 'V1gexqIlWgU', thumb: 'perception-thumb.jpg' },
   { type: 'photo', filename: '28975382015_fa3646cde1_o.jpg', override: '' },
   { type: 'photo', filename: '28899066761_a570241769_o.jpg', override: '' },
   { type: 'photo', filename: 'IMG_9742.JPG', override: '' },
@@ -487,7 +497,7 @@ let gallery = [
   { type: 'photo', filename: '620D121A-01DA-4435-B680-AE1A7B2F7F3828871027652_763858f2b8_o.jpg', override: '' },
   { type: 'photo', filename: '23FD5665-62AA-47E9-B3E9-F5098B73FCA328899618141_9e7e0cba11_o.jpg', override: '' },
   { type: 'photo', filename: 'IMG_9408.JPG', override: '' },
-  { type: 'video', title: 'Homage to the Chinese Taoist Poets', date: 'August, 2016', youtubeId: 'tevDGK7_cBs' },
+  { type: 'video', title: 'Homage to the Chinese Taoist Poets', date: 'August, 2016', youtubeId: 'tevDGK7_cBs', thumb: 'tao-thumb.jpg' },
 ];
 let pool = [];
 let selected = new Set();
@@ -560,7 +570,7 @@ function makeCard(item, idx, isPool) {
   } else {
     // Photo
     const img = document.createElement('img');
-    img.src = BASE + encodeURIComponent(item.filename);
+    img.src = tierUrl(1600, item.filename);
     img.loading = 'lazy';
     div.appendChild(img);
 
@@ -734,7 +744,7 @@ function generateCode() {
     if (item.type === 'video') {
       return `    <!-- ${item.title} · ${item.date} -->
     <div class="gallery-cell video-cell" data-type="video" data-video-id="${item.youtubeId}">
-      <img src="https://img.youtube.com/vi/${item.youtubeId}/mqdefault.jpg" alt="${item.title}" loading="lazy" onload="this.classList.add('loaded')">
+      <img src="${tierUrl(2800, item.thumb)}" alt="${item.title}" loading="lazy" onload="this.classList.add('loaded')">
       <div class="video-overlay">
         <div class="video-meta">
           <p class="video-title-label">${item.title}</p>
@@ -750,9 +760,10 @@ function generateCode() {
     </div>`;
     }
     const cls = item.override ? ` ${item.override}` : '';
-    const url = BASE + encodeURIComponent(item.filename);
+    const url = tierUrl(gridTier(item.override), item.filename);
+    const full = tierUrl(2800, item.filename);
     return `    <div class="gallery-cell${cls}" data-index="${imgIdx++}">
-      <img src="${url}" alt="Mt. Mitchell" loading="lazy" onload="this.classList.add('loaded')">
+      <img src="${url}" data-full="${full}" alt="Mt. Mitchell" loading="lazy" onload="this.classList.add('loaded')">
     </div>`;
   });
 
@@ -840,15 +851,14 @@ setStatus(`${gallery.length} items loaded · Click to select · Shift+click for 
       } else {
         const cls = item.override ? ` ${item.override}` : '';
         cell.className = `preview-cell${cls}`;
-        const url = BASE + encodeURIComponent(item.filename);
         const img = document.createElement('img');
-        img.src = url;
+        img.src = tierUrl(1600, item.filename);
         img.loading = 'lazy';
         img.onload = () => img.classList.add('loaded');
         cell.appendChild(img);
 
         const pIdx = previewItems.length;
-        previewItems.push({ src: url, alt: item.filename });
+        previewItems.push({ src: tierUrl(2800, item.filename), alt: item.filename });
 
         cell.addEventListener('click', () => openPLb(pIdx));
       }
