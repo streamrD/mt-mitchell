@@ -154,6 +154,33 @@ Upload the original to the bucket root too, so the archive stays complete.
 > than 1600/2800 px of width. The originals were generated with Pillow fitting
 > the **width**; use Pillow if that difference matters for a given image.
 
+**EXIF orientation — read before regenerating with Pillow.** Seven of the
+iPhone originals store portrait photos as landscape pixels plus an EXIF
+Orientation tag, and browsers apply that tag when rendering. Pillow does *not*:
+`Image.open()` gives you the raw, unrotated pixels, and saving drops the tag —
+so a naive resize yields a derivative that is silently rotated 90° or 180°.
+
+Always transpose first, which bakes the rotation into the pixels and removes the
+tag, so nothing downstream has to interpret it:
+
+```python
+from PIL import Image, ImageOps
+im = ImageOps.exif_transpose(Image.open(src)).convert("RGB")   # <- required
+```
+
+Note the dimensions swap for the six `Orientation=6` images: a 4032×3024 source
+is really a 3024×4032 portrait, so fitting to width 1600 gives 1600×2133, not
+1600×1200. Affected files:
+
+```
+122DE275-...2022-10-23_10-48-28_459.jpeg   (180°)
+IMG_6259.jpeg  IMG_7002.JPG  IMG_7087.JPG
+IMG_7329.JPG   IMG_7548.JPG  IMG_7734.JPG   (90° CW)
+```
+
+`sips` preserves the tag rather than dropping it, so the `sips` recipe above is
+not affected — this is a Pillow-specific trap.
+
 ---
 
 ## Videos (YouTube, unlisted)
