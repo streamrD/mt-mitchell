@@ -1,6 +1,20 @@
 # 6,684 Feet: A Gift, Revisited
 
-**URL:** https://mt-mitchell.up.railway.app
+> **Archived October 17, 2026.** The essay now lives at
+> **https://stanza.pictures/6684-feet**, made with stanza. This repo is kept as
+> a record of the original single-page site and is read-only.
+>
+> - The Railway project was deleted, so https://mt-mitchell.up.railway.app no
+>   longer serves anything.
+> - The `display/1600/` and `display/2800/` tiers, `og.jpg`, and every original
+>   already held byte-for-byte in the author's loupe library were removed from
+>   the B2 bucket. Ten originals that loupe does not hold remain in `mtmitchell`.
+>   `index.html` therefore no longer renders its photographs.
+> - The site was not registered in Umami, so there was no analytics to remove.
+>
+> Everything below describes the site as it was while live.
+
+**URL:** https://mt-mitchell.up.railway.app (retired)
 
 ## Overview
 
