@@ -6,10 +6,10 @@
 >
 > - The Railway project was deleted, so https://mt-mitchell.up.railway.app no
 >   longer serves anything.
-> - The `display/1600/` and `display/2800/` tiers, `og.jpg`, and every original
->   already held byte-for-byte in the author's loupe library were removed from
->   the B2 bucket. Ten originals that loupe does not hold remain in `mtmitchell`.
->   `index.html` therefore no longer renders its photographs.
+> - Every full-resolution original is now held byte-for-byte in the author's
+>   loupe library, so the B2 bucket `mtmitchell` (originals, the
+>   `display/1600/` and `display/2800/` tiers, `og.jpg`) was emptied and
+>   deleted. `index.html` therefore no longer renders its photographs.
 > - The website was deleted from Umami, along with its visit history.
 >
 > Everything below describes the site as it was while live.
