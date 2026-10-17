@@ -10,7 +10,7 @@
 >   already held byte-for-byte in the author's loupe library were removed from
 >   the B2 bucket. Ten originals that loupe does not hold remain in `mtmitchell`.
 >   `index.html` therefore no longer renders its photographs.
-> - The site was not registered in Umami, so there was no analytics to remove.
+> - The website was deleted from Umami, along with its visit history.
 >
 > Everything below describes the site as it was while live.
 
